@@ -10,12 +10,8 @@ public class LinePairManager : MonoBehaviour
 {
     // Camera objects
     [SerializeField] public GameObject staticCamera;
-    [SerializeField] public GameObject XRCamera;
-    // Scene prefabs
-    [SerializeField] public GameObject staticScreen;
-    [SerializeField] public GameObject dynamicScreen;
-    [SerializeField] public GameObject endScreen;
-    [SerializeField] public GameObject horizontalLP;
+    [SerializeField] public GameObject xrOrigin;
+    [SerializeField] public GameObject xrCamera;
     // Controller input actions
     [SerializeField] public InputActionReference primaryButton;
     [SerializeField] public InputActionReference triggerButton;
@@ -23,34 +19,23 @@ public class LinePairManager : MonoBehaviour
     [SerializeField] public InputActionReference joystickDown;
     [SerializeField] public bool logData = false;
     // Scenes, in order
-    private string[] scenes = { "scene_static", "lp_horizontal", "lp_vertical", "lp_diagonal", "scene_dynamic", "lp_horizontal", "lp_vertical", "lp_diagonal", "scene_end" };
+    private string[] scenes = { "scene_static", "lp_horizontal", "lp_vertical", "lp_diagonal", "scene_dynamic", "lp_horizontal", "head_horizontal", "lp_vertical", "head_vertical", "lp_diagonal", "head_diagonal", "scene_end" };
     private int sceneIndex = 0;
-    // Information on the current line scaling
-    private float currentScale = 0.5f;
-    private bool fineScale = false;
     // Tools for current scene management
     private GameObject currentScene;
-    private Transform currentCamera;
+    private GameObject lp;
     // Data for screenshotting and file writing
     private string UUID = System.Guid.NewGuid().ToString();
-    private string filePath = "VRRTData.csv";
-    private string dirPath = "VRRT Data";
+    // Update the file and directory paths to accomodate the current application path
+    // Can't use Path.Combine() since it gets funky with the slashes
+    private string dirPath = Application.persistentDataPath + "/" + "VRRT Data";
+    private string filePath = dirPath + "/" + "VRRTData.csv";
 
     void Start()
     {
-        // Set the scene control bindings
-        primaryButton.action.performed += NextScene;
-        joystickUp.action.performed += IncreaseLPSize;
-        joystickDown.action.performed += DecreaseLPSize;
-        triggerButton.action.started += FineTuneEnabled;
-        triggerButton.action.canceled += FineTuneDisabled;
         // Set up data logging if toggled
         if (logData)
         {
-            // Update the file and directory paths to accomodate the current application path
-            // Can't use Path.Combine() since it gets funky with the slashes
-            dirPath = Application.persistentDataPath + "/" + dirPath;
-            filePath = dirPath + "/" + filePath;
 
             // Make sure the screenshot folder and text document exists
             if (!Directory.Exists(dirPath)) Directory.CreateDirectory(dirPath);
@@ -76,10 +61,15 @@ public class LinePairManager : MonoBehaviour
             }
             Debug.Log("Data being saved to: " + filePath);
         }
-        // Set the current parent
-        currentCamera = staticCamera.transform;
+        // Set up a line pair tool
+        lp = new LinePair(xrCamera, filePath);
+        primaryButton.action.performed += NextScene;
+        joystickUp.action.performed += lp.IncreaseSize;
+        joystickDown.action.performed += lp.DecreaseSize;
+        triggerButton.action.started += lp.FineTuneEnabled;
+        triggerButton.action.canceled += lp.FineTuneDisabled;
         // Show the start screen
-        currentScene = Instantiate(staticScreen);
+        currentScene = Instantiate(Resources.Load("Static Screen"));
     }
 
     public void NextScene(InputAction.CallbackContext context)
@@ -99,22 +89,22 @@ public class LinePairManager : MonoBehaviour
         var sceneName = scenes[sceneIndex].Split("_");
 
         // Check if we're logging line pair data
-        if (logData & sceneName[0] == "lp")
+        if (logData)
         {
-            Debug.Log(sceneName);
-            // Screenshot the current camera view
-            ScreenCapture.CaptureScreenshot(dirPath + "/" + UUID + "-" + sceneIndex + ".png");
-            Debug.Log(dirPath + "/" + UUID + "-" + sceneIndex + ".png");
-            // Write the current data to the text document
-            using (StreamWriter sw = File.AppendText(filePath))
+            switch (sceneName[0])
             {
-                // Write the line size
-                sw.Write("," + currentScale.ToString("F3") + "mm");
-                if (sceneIndex > 4)
-                {
-                    // Also save head rotation position (horizontal + vertical)
-                    sw.Write("," + currentCamera.localEulerAngles.y.ToString("F3") + "/" + currentCamera.localEulerAngles.x.ToString("F3"));
-                }
+                case "lp":
+                    Debug.Log(sceneName);
+                    // Screenshot the current camera view
+                    ScreenCapture.CaptureScreenshot(dirPath + "/" + UUID + "-" + sceneIndex + ".png");
+                    Debug.Log(dirPath + "/" + UUID + "-" + sceneIndex + ".png");
+                    // Write the current data to the text document
+                    // Only log head data for dynamic tests
+                    lp.logData(true, sceneIndex > 4);
+                    break;
+                case "head":
+                    // Just log head positioning
+                    lp.logData(false, true);
             }
         }
         // Destroy the existing scene
@@ -135,23 +125,17 @@ public class LinePairManager : MonoBehaviour
 
     private void drawNewLPs(string[] sceneName)
     {
-        // Create the static lines
-        // (Five line pairs with differenting sizes)
-        currentScene = Instantiate(horizontalLP);
-        currentScene.name = "Line Pairs";
-        // Scale the scene to match the last point
-        currentScene.transform.localScale = new Vector3(1, 1, currentScale);
-        // Change the scene based on the setup
         switch (sceneName[1])
         {
             case "horizontal":
                 // No rotation needed
+                lp.MakeLines();
                 break;
             case "vertical":
-                currentScene.transform.Rotate(0, 90, 0);
+                lp.RotateTo(90);
                 break;
             case "diagonal":
-                currentScene.transform.Rotate(0, 45, 0);
+                lp.RotateTo(45);
                 break;
         }
     }
@@ -161,74 +145,21 @@ public class LinePairManager : MonoBehaviour
         // Show the right menu based on the name
         switch (sceneName[1])
         {
-            case "static":
-                // Show the static menu
-                currentScene = Instantiate(staticScreen);
-                break;
             case "dynamic":
                 // Enable head tracking
                 staticCamera.SetActive(false);
-                XRCamera.SetActive(true);
+                xrOrigin.SetActive(true);
                 // Change parents
-                currentCamera = XRCamera.transform.GetChild(0).GetChild(0);
-                currentScene = Instantiate(dynamicScreen);
+                currentScene = Instantiate(Resources.Load("Dynamic Screen"));
                 break;
             case "end":
-                currentScene = Instantiate(endScreen);
+                currentScene = Instantiate(Resources.Load("End Screen"));
                 break;
         }
     }
-
-
-    void IncreaseLPSize(InputAction.CallbackContext context)
-    {
-        // Make sure its a line pair scene
-        if (scenes[sceneIndex].Split("_")[0] == "scene") return;
-        // Check if fine zoom is enabled (change by 0.001mm)
-        if (fineScale)
-        {
-            currentScale += 0.001f;
-        }
-        // Otherwise just scale by 0.01m
-        else
-        {
-            currentScale += 0.01f;
-        }
-        // Limit scale up
-        if (currentScale > 0.5f) currentScale = 0.5f;
-        // Apply the current scale
-        currentScene.transform.localScale = new Vector3(1, 1, currentScale);
-    }
-
-    void DecreaseLPSize(InputAction.CallbackContext context)
-    {
-        if (scenes[sceneIndex].Split("_")[0] == "scene") return;
-        if (fineScale)
-        {
-            currentScale -= 0.001f;
-        }
-        else
-        {
-            currentScale -= 0.01f;
-        }
-        // Limit zoom in
-        if (currentScale < 0f) currentScale = 0f;
-        currentScene.transform.localScale = new Vector3(1, 1, currentScale);
-
-    }
-
-    void FineTuneEnabled(InputAction.CallbackContext context)
-    {
-        fineScale = true;
-    }
-    void FineTuneDisabled(InputAction.CallbackContext context)
-    {
-        fineScale = false;
-    }
-
     void Update()
     {
         // Keep the current scene at the given position
-        currentScene.transform.position = new Vector3(0, -currentCamera.localPosition.z, 0);
+        currentScene.transform.position = new Vector3(0, -xrCamera.localPosition.z, 0);
     }
 }

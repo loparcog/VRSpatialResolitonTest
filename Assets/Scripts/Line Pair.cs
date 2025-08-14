@@ -1,0 +1,113 @@
+public class LinePair : MonoBehaviour
+{
+    // Horizontal line pair (1mm lines)
+    private GameObject lines;
+    private GameObject xrCamera;
+    // Current scale
+    private float currentScale = 0.5f;
+    // File for logging
+    private string logFile;
+    private bool fineScale;
+
+    public void LinePair(GameObject camera, string logFilePath = "")
+    {
+        // Save camera for head rotation
+        xrCamera = camera;
+        // Save log file path
+        logFile = logFilePath;
+    }
+
+    public void MakeLines()
+    {
+        // Instantiate the line pair
+        lines = Instantiate(Resources.Load<GameObject>("HLP"));
+        lines.name = "Line Pairs";
+        // Reset the current scale
+        currentScale = 0.5f;
+        // Scale the scene to match the scale point
+        lines.transform.localScale = new Vector3(1, 1, currentScale);
+    }
+
+    public void RotateTo(float angle)
+    {
+        lines.transform.Rotate(0, angle, 0);
+    }
+
+    public void IncreaseSize(InputAction.CallbackContext context)
+    {
+        // Check if fine zoom is enabled (change by 0.001mm)
+        if (fineScale)
+        {
+            currentScale += 0.001f;
+        }
+        // Otherwise just scale by 0.01m
+        else
+        {
+            currentScale += 0.01f;
+        }
+        // Limit scale up
+        if (currentScale > 0.5f) currentScale = 0.5f;
+        // Apply the current scale
+        lines.transform.localScale = new Vector3(1, 1, currentScale);
+    }
+
+    public void DecreaseSize(InputAction.CallbackContext context)
+    {
+        if (fineScale)
+        {
+            currentScale -= 0.001f;
+        }
+        else
+        {
+            currentScale -= 0.01f;
+        }
+        // Limit scale down
+        if (currentScale < 0f) currentScale = 0f;
+        currentScene.transform.localScale = new Vector3(1, 1, currentScale);
+
+    }
+
+    public void InitLog(string dirPath, string UUID)
+    {
+        // Make sure the screenshot folder and text document exists
+        if (!Directory.Exists(dirPath)) Directory.CreateDirectory(dirPath);
+        if (!File.Exists(filePath))
+        {
+            // Set up the CSV
+            using (StreamWriter sw = new StreamWriter(filePath))
+            {
+                // UUID for the user
+                // S_ = Static, D_ = Dynamic (head tracking), HP = Head Position
+                // _H, _V, _D = Horizontal, Vertical, Diagonal
+                sw.WriteLine("UUID,SH,SV,SD,DH,HPH,DV,HPV,DD,HPD");
+                sw.Write(UUID);
+            }
+        }
+        else
+        {
+            // Just write the UUID
+            using (StreamWriter sw = File.AppendText(filePath))
+            {
+                sw.Write("\n" + UUID);
+            }
+        }
+        Debug.Log("Data being saved to: " + filePath);
+    }
+
+    public void LogData(bool logLineSize, bool logHeadPos)
+    {
+        // Write to the stored log file path
+        using (StreamWriter sw = File.AppendText(logFile))
+        {
+            // Save the current size of the lines
+            if (logLineSize) sw.Write("," + currentScale.ToString("F3") + "mm");
+            // Also save head rotation position (horizontal + vertical)
+            if (logHeadPos) sw.Write("," + xrCamera.localEulerAngles.y.ToString("F3") + "/" + xrCamera.localEulerAngles.x.ToString("F3"));
+        }
+    }
+
+    public void Remove()
+    {
+        Destroy(lines);
+    }
+}
