@@ -343,6 +343,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1822586893}
+  - component: {fileID: 1822586894}
   m_Layer: 0
   m_Name: Script Manager
   m_TagString: Untagged
@@ -365,6 +366,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1822586894
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1822586891}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 838ffca512d16f441b5fc1f17b68b133, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  primaryButton: {fileID: -8446603351089622980, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  triggerButton: {fileID: -5874932509919229387, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  joystickUp: {fileID: 127311413498606810, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  joystickDown: {fileID: 7198656946504207780, guid: 052faaac586de48259a63d0c4782560b, type: 3}
 --- !u!1001 &1877012585
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -426,7 +443,7 @@ PrefabInstance:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 1822586893}
   - {fileID: 1365965347}
   - {fileID: 1877012585}
   - {fileID: 1302102975}
+  - {fileID: 1822586893}

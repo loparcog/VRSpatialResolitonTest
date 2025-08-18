@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 public class LinePair : MonoBehaviour
 {
     // Horizontal line pair (1mm lines)
-    private GameObject lines;
+    public GameObject lines;
     private Transform xrCamera;
     // Current scale
     private float currentScale = 0.5f;
@@ -13,21 +13,19 @@ public class LinePair : MonoBehaviour
     private string logFile;
     private bool fineScale;
 
-    public void Initialize(Transform camera, string logFilePath = "")
+    public void SetCamera(Transform camera)
     {
         // Save camera for head rotation
         xrCamera = camera;
-        // Save log file path
-        logFile = logFilePath;
     }
 
-    public void MakeLines()
+    public void MakeLines(float scale = 0.5f)
     {
         // Instantiate the line pair
         lines = Instantiate(Resources.Load<GameObject>("HLP"));
         lines.name = "Line Pairs";
         // Reset the current scale
-        currentScale = 0.5f;
+        currentScale = scale;
         // Scale the scene to match the scale point
         lines.transform.localScale = new Vector3(1, 1, currentScale);
     }
@@ -44,7 +42,7 @@ public class LinePair : MonoBehaviour
         {
             currentScale += 0.001f;
         }
-        // Otherwise just scale by 0.01m
+        // Otherwise just scale by 0.01cm
         else
         {
             currentScale += 0.01f;
@@ -88,8 +86,10 @@ public class LinePair : MonoBehaviour
         }
     }
 
-    public void InitLog(string dirPath, string UUID)
+    public void InitLog(string dirPath, string filePath, string UUID)
     {
+        // Store the file path for future logging
+        logFile = filePath;
         // Make sure the screenshot folder and text document exists
         if (!Directory.Exists(dirPath)) Directory.CreateDirectory(dirPath);
         if (!File.Exists(logFile))
@@ -98,9 +98,7 @@ public class LinePair : MonoBehaviour
             using (StreamWriter sw = new StreamWriter(logFile))
             {
                 // UUID for the user
-                // S_ = Static, D_ = Dynamic (head tracking), HP = Head Position
-                // _H, _V, _D = Horizontal, Vertical, Diagonal
-                sw.WriteLine("UUID,SH,SV,SD,DH,HPH,DV,HPV,DD,HPD");
+                sw.WriteLine("UUID,Static Horizontal,Static Vertical,Static Diagonal,Dynamic Hoizontal,Headpos Horizontal,Negative Headpos Horizontal,Dynamic Vertical,HeadPos Vertical,Negative Headpos Vertical,Dynamic Diagonal,Headpos Diagonal");
                 sw.Write(UUID);
             }
         }

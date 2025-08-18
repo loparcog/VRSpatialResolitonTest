@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using Unity.VisualScripting;
 using Unity.XR.CoreUtils;
@@ -5,6 +6,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Analytics;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class TutorialManager : MonoBehaviour
 {
@@ -21,13 +23,12 @@ public class TutorialManager : MonoBehaviour
     private string[] scenes = { "start", "tutorial" };
     private int sceneIndex = 0;
     private GameObject currentScene;
-    // Information on the current line scaling
-    private float currentScale = 1.0f;
-    private bool fineScale = false;
     private LinePair lp;
 
     void Start()
     {
+        // Create the line pair for future use
+        lp = this.AddComponent<LinePair>();
         // Only bind the nextScene button
         primaryButton.action.performed += NextScene;
         // Show the initial info screen
@@ -40,7 +41,9 @@ public class TutorialManager : MonoBehaviour
         // Iterate to the next scene if possible
         if (sceneIndex == scenes.Length - 1)
         {
-            // End of scenes, continue to the line tester
+            // End of scenes, remove controls and continue to the line tester
+            DeregisterControls();
+            SceneManager.LoadScene(1);
             return;
         }
 
@@ -49,57 +52,45 @@ public class TutorialManager : MonoBehaviour
         // Iterate the scene index
         sceneIndex += 1;
         // Set up the new scene
-        drawNewMenu();
+        buildTutorial();
     }
-    private void drawNewMenu()
+    private void buildTutorial()
     {
-        // TODO
-        return;
+        // Set up scene and line pair
+        currentScene = (GameObject)Instantiate(Resources.Load("Tutorial Screen"));
+        lp.MakeLines(0.3f);
+        lp.lines.transform.position = new Vector3(10, 0, 0);
+        // Register controls to change the line movement
+        RegisterControls();
+    }
+
+    void RegisterControls()
+    {
+        // Register line changing controls
+        joystickUp.action.performed += IncreaseLPSize;
+        joystickDown.action.performed += DecreaseLPSize;
+        triggerButton.action.started += lp.FineTuneEnabled;
+        triggerButton.action.canceled += lp.FineTuneDisabled;
+    }
+
+    void DeregisterControls()
+    {
+        // Remove NextScene button as well
+        primaryButton.action.performed -= NextScene;
+        joystickUp.action.performed -= IncreaseLPSize;
+        joystickDown.action.performed -= DecreaseLPSize;
+        triggerButton.action.started -= lp.FineTuneEnabled;
+        triggerButton.action.canceled -= lp.FineTuneDisabled;
     }
 
     void IncreaseLPSize(InputAction.CallbackContext context)
     {
-        // Make sure its a line pair scene
-        if (scenes[sceneIndex].Split("_")[0] == "scene") return;
-        // Check if fine zoom is enabled (change by 0.001mm)
-        if (fineScale)
-        {
-            currentScale += 0.001f;
-        }
-        // Otherwise just scale by 0.01m
-        else
-        {
-            currentScale += 0.01f;
-        }
-        // Limit scale up
-        if (currentScale > 0.5f) currentScale = 0.5f;
-        // Apply the current scale
-        currentScene.transform.localScale = new Vector3(1, 1, currentScale);
+        // No check needed here, only used when line pairs are visible
+        lp.IncreaseSize();
     }
 
     void DecreaseLPSize(InputAction.CallbackContext context)
     {
-        if (scenes[sceneIndex].Split("_")[0] == "scene") return;
-        if (fineScale)
-        {
-            currentScale -= 0.001f;
-        }
-        else
-        {
-            currentScale -= 0.01f;
-        }
-        // Limit zoom in
-        if (currentScale < 0f) currentScale = 0f;
-        currentScene.transform.localScale = new Vector3(1, 1, currentScale);
-
-    }
-
-    void FineTuneEnabled(InputAction.CallbackContext context)
-    {
-        fineScale = true;
-    }
-    void FineTuneDisabled(InputAction.CallbackContext context)
-    {
-        fineScale = false;
+        lp.DecreaseSize();
     }
 }

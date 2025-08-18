@@ -21,7 +21,7 @@ public class LineTestManager : MonoBehaviour
     [SerializeField] public InputActionReference joystickDown;
     [SerializeField] public bool logData = false;
     // Scenes, in order
-    private string[] scenes = { "scene_static", "lp_horizontal", "lp_vertical", "lp_diagonal", "scene_dynamic", "lp_horizontal", "head_horizontal", "lp_vertical", "head_vertical", "lp_diagonal", "head_diagonal", "scene_end" };
+    private string[] scenes = { "scene_static", "lp_horizontal", "lp_vertical", "lp_diagonal", "scene_dynamic", "lp_horizontal", "head_horizontal", "lp_vertical", "head_vertical", "lp_diagonal", "scene_end" };
     private int sceneIndex = 0;
     // Tools for current scene management
     private GameObject currentScene;
@@ -36,6 +36,9 @@ public class LineTestManager : MonoBehaviour
 
     void Start()
     {
+        // Set up a line pair tool
+        lp = this.AddComponent<LinePair>();
+        lp.SetCamera(xrCamera);
         // Set up data logging if toggled
         if (logData)
         {
@@ -43,33 +46,10 @@ public class LineTestManager : MonoBehaviour
             dirPath = Application.persistentDataPath + "/" + dirPath;
             filePath = dirPath + "/" + filePath;
 
-            // Make sure the screenshot folder and text document exists
-            if (!Directory.Exists(dirPath)) Directory.CreateDirectory(dirPath);
-            if (!File.Exists(filePath))
-            {
-                // Set up the CSV
-                using (StreamWriter sw = new StreamWriter(filePath))
-                {
-                    // UUID for the user
-                    // S_ = Static, D_ = Dynamic (head tracking), HP = Head Position
-                    // _H, _V, _D = Horizontal, Vertical, Diagonal
-                    sw.WriteLine("UUID,Static H,Static V,Static D,Dynamic H,HeadPos H,NegativeHeadPos H,Dynamic V,HeadPos V,NegativeHeadPos V,Dynamic D,Headpos D,NegativeHeadPos D");
-                    sw.Write(UUID);
-                }
-            }
-            else
-            {
-                // Just write the UUID
-                using (StreamWriter sw = File.AppendText(filePath))
-                {
-                    sw.Write("\n" + UUID);
-                }
-            }
-            Debug.Log("Data being saved to: " + filePath);
+            // Init logging with the line pair tool
+            lp.InitLog(dirPath, filePath, UUID);
         }
-        // Set up a line pair tool
-        lp = this.AddComponent<LinePair>();
-        lp.Initialize(xrCamera, filePath);
+        // Set up action bindings
         primaryButton.action.performed += NextScene;
         joystickUp.action.performed += IncreaseLPSize;
         joystickDown.action.performed += DecreaseLPSize;
@@ -139,7 +119,7 @@ public class LineTestManager : MonoBehaviour
         else if (sceneName[0] == "head")
         {
             // Line tuning is off, update text
-            instructionText.text = "Move your head perpendicular to the lines until they are not visible";
+            instructionText.text = "Move your head perpendicular to the lines until they are no longer distinguishable";
         }
         else
         {
@@ -151,7 +131,7 @@ public class LineTestManager : MonoBehaviour
     private void drawNewLPs(string[] sceneName)
     {
         // Set up instruction text
-        instructionText.text = "Make the lines as small as possible while still remaining visible";
+        instructionText.text = "Make the lines as small as possible while still being distinguishable";
         switch (sceneName[1])
         {
             case "horizontal":
