@@ -673,7 +673,7 @@ MonoBehaviour:
   triggerButton: {fileID: -5874932509919229387, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   joystickUp: {fileID: 127311413498606810, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   joystickDown: {fileID: 7198656946504207780, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  logData: 1
+  logData: 0
 --- !u!224 &1822586893
 RectTransform:
   m_ObjectHideFlags: 0

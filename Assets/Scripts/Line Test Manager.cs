@@ -62,8 +62,7 @@ public class LineTestManager : MonoBehaviour
         textObject.name = "Instruction Text";
         textObject.AddComponent<TextMeshPro>();
         textObject.transform.Rotate(90, 0, 0);
-        textObject.transform.position = new Vector3(0, 0, 15);
-        textObject.GetComponent<RectTransform>().sizeDelta = new Vector2(20, 5);
+        textObject.GetComponent<RectTransform>().sizeDelta = new Vector2(30, 5);
         instructionText = textObject.GetComponent<TextMeshPro>();
         instructionText.alignment = TextAlignmentOptions.Center;
         instructionText.fontSize = 20;
@@ -182,5 +181,7 @@ public class LineTestManager : MonoBehaviour
     {
         // Keep the current scene at the given position
         lp.keepDistance();
+        // Also update the line text
+        instructionText.transform.position = new Vector3(0, -xrCamera.localPosition.z, 15);
     }
 }
