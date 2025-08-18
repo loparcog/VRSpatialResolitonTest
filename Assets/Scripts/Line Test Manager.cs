@@ -1,17 +1,19 @@
 using System.IO;
+using TMPro;
 using Unity.VisualScripting;
 using Unity.XR.CoreUtils;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Analytics;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
-public class LinePairManager : MonoBehaviour
+public class LineTestManager : MonoBehaviour
 {
     // Camera objects
     [SerializeField] public GameObject staticCamera;
     [SerializeField] public GameObject xrOrigin;
-    [SerializeField] public GameObject xrCamera;
+    [SerializeField] public Transform xrCamera;
     // Controller input actions
     [SerializeField] public InputActionReference primaryButton;
     [SerializeField] public InputActionReference triggerButton;
@@ -23,19 +25,23 @@ public class LinePairManager : MonoBehaviour
     private int sceneIndex = 0;
     // Tools for current scene management
     private GameObject currentScene;
-    private GameObject lp;
+    private LinePair lp;
+    private TextMeshPro instructionText;
     // Data for screenshotting and file writing
     private string UUID = System.Guid.NewGuid().ToString();
     // Update the file and directory paths to accomodate the current application path
     // Can't use Path.Combine() since it gets funky with the slashes
-    private string dirPath = Application.persistentDataPath + "/" + "VRRT Data";
-    private string filePath = dirPath + "/" + "VRRTData.csv";
+    private string dirPath = "VRRT Data";
+    private string filePath = "VRRTData.csv";
 
     void Start()
     {
         // Set up data logging if toggled
         if (logData)
         {
+            // Set up proper file paths
+            dirPath = Application.persistentDataPath + "/" + dirPath;
+            filePath = dirPath + "/" + filePath;
 
             // Make sure the screenshot folder and text document exists
             if (!Directory.Exists(dirPath)) Directory.CreateDirectory(dirPath);
@@ -47,7 +53,7 @@ public class LinePairManager : MonoBehaviour
                     // UUID for the user
                     // S_ = Static, D_ = Dynamic (head tracking), HP = Head Position
                     // _H, _V, _D = Horizontal, Vertical, Diagonal
-                    sw.WriteLine("UUID,SH,SV,SD,DH,HPH,DV,HPV,DD,HPD");
+                    sw.WriteLine("UUID,Static H,Static V,Static D,Dynamic H,HeadPos H,NegativeHeadPos H,Dynamic V,HeadPos V,NegativeHeadPos V,Dynamic D,Headpos D,NegativeHeadPos D");
                     sw.Write(UUID);
                 }
             }
@@ -62,14 +68,25 @@ public class LinePairManager : MonoBehaviour
             Debug.Log("Data being saved to: " + filePath);
         }
         // Set up a line pair tool
-        lp = new LinePair(xrCamera, filePath);
+        lp = this.AddComponent<LinePair>();
+        lp.Initialize(xrCamera, filePath);
         primaryButton.action.performed += NextScene;
-        joystickUp.action.performed += lp.IncreaseSize;
-        joystickDown.action.performed += lp.DecreaseSize;
+        joystickUp.action.performed += IncreaseLPSize;
+        joystickDown.action.performed += DecreaseLPSize;
         triggerButton.action.started += lp.FineTuneEnabled;
         triggerButton.action.canceled += lp.FineTuneDisabled;
         // Show the start screen
-        currentScene = Instantiate(Resources.Load("Static Screen"));
+        currentScene = (GameObject)Instantiate(Resources.Load("Static Screen"));
+        // Also instantiate the instruction text
+        var textObject = new GameObject();
+        textObject.name = "Instruction Text";
+        textObject.AddComponent<TextMeshPro>();
+        textObject.transform.Rotate(90, 0, 0);
+        textObject.transform.position = new Vector3(0, 0, 15);
+        textObject.GetComponent<RectTransform>().sizeDelta = new Vector2(20, 5);
+        instructionText = textObject.GetComponent<TextMeshPro>();
+        instructionText.alignment = TextAlignmentOptions.Center;
+        instructionText.fontSize = 20;
     }
 
     public void NextScene(InputAction.CallbackContext context)
@@ -100,11 +117,12 @@ public class LinePairManager : MonoBehaviour
                     Debug.Log(dirPath + "/" + UUID + "-" + sceneIndex + ".png");
                     // Write the current data to the text document
                     // Only log head data for dynamic tests
-                    lp.logData(true, sceneIndex > 4);
+                    lp.LogData(true, sceneIndex > 4);
                     break;
                 case "head":
                     // Just log head positioning
-                    lp.logData(false, true);
+                    lp.LogData(false, true);
+                    break;
             }
         }
         // Destroy the existing scene
@@ -115,16 +133,25 @@ public class LinePairManager : MonoBehaviour
         // Set up the new scene
         if (sceneName[0] == "lp")
         {
+            // Edit line pair
             drawNewLPs(sceneName);
+        }
+        else if (sceneName[0] == "head")
+        {
+            // Line tuning is off, update text
+            instructionText.text = "Move your head perpendicular to the lines until they are not visible";
         }
         else
         {
+            // Draw the set menu
             drawNewMenu(sceneName);
         }
     }
 
     private void drawNewLPs(string[] sceneName)
     {
+        // Set up instruction text
+        instructionText.text = "Make the lines as small as possible while still remaining visible";
         switch (sceneName[1])
         {
             case "horizontal":
@@ -142,6 +169,9 @@ public class LinePairManager : MonoBehaviour
 
     private void drawNewMenu(string[] sceneName)
     {
+        // Delete the lines if possible and remove text
+        instructionText.text = "";
+        lp.Remove();
         // Show the right menu based on the name
         switch (sceneName[1])
         {
@@ -150,16 +180,27 @@ public class LinePairManager : MonoBehaviour
                 staticCamera.SetActive(false);
                 xrOrigin.SetActive(true);
                 // Change parents
-                currentScene = Instantiate(Resources.Load("Dynamic Screen"));
+                currentScene = (GameObject)Instantiate(Resources.Load("Dynamic Screen"));
                 break;
             case "end":
-                currentScene = Instantiate(Resources.Load("End Screen"));
+                currentScene = (GameObject)Instantiate(Resources.Load("End Screen"));
                 break;
         }
+    }
+
+    private void IncreaseLPSize(InputAction.CallbackContext context)
+    {
+        if (scenes[sceneIndex].Split("_")[0] == "lp") lp.IncreaseSize();
+    }
+
+    private void DecreaseLPSize(InputAction.CallbackContext context)
+    {
+        if (scenes[sceneIndex].Split("_")[0] == "lp") lp.DecreaseSize();
+        
     }
     void Update()
     {
         // Keep the current scene at the given position
-        currentScene.transform.position = new Vector3(0, -xrCamera.localPosition.z, 0);
+        lp.keepDistance();
     }
 }

@@ -312,11 +312,13 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "The next three scenes will also show you horizontal, vertical, and diagonal
-    line pairs, but head movement WILL change visibility. Try to keep your head relatively
+  m_text: 'Head movement WILL change visibility. Try to keep your head relatively
     level and do not rotate to increase visiblity of the vertical and diagonal line
-    pairs.\n Adjust the line sizes until you are able to see all three lines and
-    their gaps in between equally."
+    pairs.
+
+
+    Please adjust the lines to the smallest possible size that still
+    allows you to distinctly see all 5.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

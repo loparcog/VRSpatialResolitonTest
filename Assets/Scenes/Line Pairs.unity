@@ -667,24 +667,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   staticCamera: {fileID: 369755263}
-  XRCamera: {fileID: 134278399}
-  staticScreen: {fileID: 2371330796395690905, guid: 21f10df1572c8144bbaf9cc5d5241e4d, type: 3}
-  dynamicScreen: {fileID: 2371330796395690905, guid: f97435a5b86384e479e4ae582ba273fc, type: 3}
-  endScreen: {fileID: 2371330796395690905, guid: bab9d4ad06bf6d84ba3db128cc937f37, type: 3}
-  horizontalLP: {fileID: 4110633588489266064, guid: ddb0c7b9778b011459f8c6466715b979, type: 3}
+  xrOrigin: {fileID: 134278399}
+  xrCamera: {fileID: 503562132}
   primaryButton: {fileID: -8446603351089622980, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   triggerButton: {fileID: -5874932509919229387, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   joystickUp: {fileID: 127311413498606810, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   joystickDown: {fileID: 7198656946504207780, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   logData: 0
---- !u!4 &1822586893
-Transform:
+--- !u!224 &1822586893
+RectTransform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1822586891}
-  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -692,6 +688,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 20, y: 5}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1001 &1877012585
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -785,7 +786,7 @@ Transform:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 1822586893}
   - {fileID: 1365965347}
   - {fileID: 1877012585}
   - {fileID: 1715948673}
+  - {fileID: 1822586893}

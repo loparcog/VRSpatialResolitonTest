@@ -8,9 +8,6 @@ using UnityEngine.InputSystem;
 
 public class TutorialManager : MonoBehaviour
 {
-    // Scene prefabs
-    [SerializeField] public GameObject startScreen;
-    [SerializeField] public GameObject tutorialScreen;
     // Controller input actions
     [SerializeField] public InputActionReference primaryButton;
     [SerializeField] public InputActionReference triggerButton;
@@ -21,18 +18,20 @@ public class TutorialManager : MonoBehaviour
     // 1 > Line pair example
     // 2 > Line pair without toggling
     // 3 > Line pair with toggling
+    private string[] scenes = { "start", "tutorial" };
     private int sceneIndex = 0;
     private GameObject currentScene;
     // Information on the current line scaling
     private float currentScale = 1.0f;
     private bool fineScale = false;
+    private LinePair lp;
 
     void Start()
     {
         // Only bind the nextScene button
         primaryButton.action.performed += NextScene;
         // Show the initial info screen
-        currentScene = Instantiate(startScreen);
+        currentScene = (GameObject)Instantiate(Resources.Load("Start Screen"));
     }
 
     public void NextScene(InputAction.CallbackContext context)

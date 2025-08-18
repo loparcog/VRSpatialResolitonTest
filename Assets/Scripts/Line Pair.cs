@@ -1,15 +1,19 @@
+using System.IO;
+using UnityEngine;
+using UnityEngine.InputSystem;
+
 public class LinePair : MonoBehaviour
 {
     // Horizontal line pair (1mm lines)
     private GameObject lines;
-    private GameObject xrCamera;
+    private Transform xrCamera;
     // Current scale
     private float currentScale = 0.5f;
     // File for logging
     private string logFile;
     private bool fineScale;
 
-    public void LinePair(GameObject camera, string logFilePath = "")
+    public void Initialize(Transform camera, string logFilePath = "")
     {
         // Save camera for head rotation
         xrCamera = camera;
@@ -33,7 +37,7 @@ public class LinePair : MonoBehaviour
         lines.transform.Rotate(0, angle, 0);
     }
 
-    public void IncreaseSize(InputAction.CallbackContext context)
+    public void IncreaseSize()
     {
         // Check if fine zoom is enabled (change by 0.001mm)
         if (fineScale)
@@ -51,7 +55,7 @@ public class LinePair : MonoBehaviour
         lines.transform.localScale = new Vector3(1, 1, currentScale);
     }
 
-    public void DecreaseSize(InputAction.CallbackContext context)
+    public void DecreaseSize()
     {
         if (fineScale)
         {
@@ -63,18 +67,35 @@ public class LinePair : MonoBehaviour
         }
         // Limit scale down
         if (currentScale < 0f) currentScale = 0f;
-        currentScene.transform.localScale = new Vector3(1, 1, currentScale);
+        lines.transform.localScale = new Vector3(1, 1, currentScale);
 
+    }
+
+    public void FineTuneEnabled(InputAction.CallbackContext context)
+    {
+        fineScale = true;
+    }
+    public void FineTuneDisabled(InputAction.CallbackContext context)
+    {
+        fineScale = false;
+    }
+
+    public void keepDistance()
+    {
+        if (lines)
+        {
+            lines.transform.position = new Vector3(0, -xrCamera.localPosition.z, 0);
+        }
     }
 
     public void InitLog(string dirPath, string UUID)
     {
         // Make sure the screenshot folder and text document exists
         if (!Directory.Exists(dirPath)) Directory.CreateDirectory(dirPath);
-        if (!File.Exists(filePath))
+        if (!File.Exists(logFile))
         {
             // Set up the CSV
-            using (StreamWriter sw = new StreamWriter(filePath))
+            using (StreamWriter sw = new StreamWriter(logFile))
             {
                 // UUID for the user
                 // S_ = Static, D_ = Dynamic (head tracking), HP = Head Position
@@ -86,12 +107,12 @@ public class LinePair : MonoBehaviour
         else
         {
             // Just write the UUID
-            using (StreamWriter sw = File.AppendText(filePath))
+            using (StreamWriter sw = File.AppendText(logFile))
             {
                 sw.Write("\n" + UUID);
             }
         }
-        Debug.Log("Data being saved to: " + filePath);
+        Debug.Log("Data being saved to: " + logFile);
     }
 
     public void LogData(bool logLineSize, bool logHeadPos)
