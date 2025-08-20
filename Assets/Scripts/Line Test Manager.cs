@@ -150,11 +150,17 @@ public class LineTestManager : MonoBehaviour
         // Set up the new scene
         if (sceneName[0] == "lp")
         {
+            // Enable the joystick
+            joystickUp.action.Enable();
+            joystickDown.action.Enable();
             // Edit line pair
             drawNewLPs(sceneName);
         }
         else if (sceneName[0] == "head")
         {
+            // Disable the joystick
+            joystickUp.action.Disable();
+            joystickDown.action.Disable();
             // Line tuning is off, update text
             instructionText.text = "Move your head perpendicular to the lines until they are no longer distinguishable";
         }
