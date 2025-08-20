@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using TMPro;
 using Unity.VisualScripting;
@@ -27,6 +28,9 @@ public class LineTestManager : MonoBehaviour
     private GameObject currentScene;
     private LinePair lp;
     private TextMeshPro instructionText;
+    // Tools for line pair scaling
+    private float[] UpDownTime = {0, 0};
+    private bool[] UpDownHeld = {false, false};
     // Data for screenshotting and file writing
     private string UUID = System.Guid.NewGuid().ToString();
     // Update the file and directory paths to accomodate the current application path
@@ -51,8 +55,36 @@ public class LineTestManager : MonoBehaviour
         }
         // Set up action bindings
         primaryButton.action.performed += NextScene;
-        joystickUp.action.performed += IncreaseLPSize;
-        joystickDown.action.performed += DecreaseLPSize;
+        // Joystick scaling
+        joystickUp.action.canceled +=
+            (context) =>
+            {
+                UpDownHeld[0] = false;
+                UpDownTime[0] = 0; 
+            };
+        joystickUp.action.performed +=
+            (context) =>
+            {
+                // Perform base action
+                IncreaseLPSize();
+                // Start adding to time
+                UpDownHeld[0] = true;
+            };
+        joystickDown.action.canceled +=
+            (context) =>
+            {
+                UpDownHeld[1] = false;
+                UpDownTime[1] = 0; 
+            };
+        joystickDown.action.performed +=
+            (context) =>
+            {
+                // Perform base action
+                DecreaseLPSize();
+                // Start adding to time
+                UpDownHeld[1] = true;
+            };
+        // Fine tune triggers
         triggerButton.action.started += lp.FineTuneEnabled;
         triggerButton.action.canceled += lp.FineTuneDisabled;
         // Show the start screen
@@ -167,12 +199,12 @@ public class LineTestManager : MonoBehaviour
         }
     }
 
-    private void IncreaseLPSize(InputAction.CallbackContext context)
+    private void IncreaseLPSize()
     {
         if (scenes[sceneIndex].Split("_")[0] == "lp") lp.IncreaseSize();
     }
 
-    private void DecreaseLPSize(InputAction.CallbackContext context)
+    private void DecreaseLPSize()
     {
         if (scenes[sceneIndex].Split("_")[0] == "lp") lp.DecreaseSize();
         
@@ -183,5 +215,28 @@ public class LineTestManager : MonoBehaviour
         lp.keepDistance();
         // Also update the line text
         instructionText.transform.position = new Vector3(0, -xrCamera.localPosition.z, 15);
+        // Check for held values
+        // UP
+        if (UpDownHeld[0])
+        {
+            // Add delta time (done in seconds)
+            UpDownTime[0] += Time.deltaTime;
+            if (UpDownTime[0] > 0.5)
+            {
+                // Repeatedly increase size
+                IncreaseLPSize();
+            }
+        }
+        // DOWN
+        else if (UpDownHeld[1])
+        {
+            // Add delta time (done in seconds)
+            UpDownTime[1] += Time.deltaTime;
+            if (UpDownTime[1] > 0.5)
+            {
+                // Repeatedly increase size
+                DecreaseLPSize();
+            }
+        }
     }
 }
