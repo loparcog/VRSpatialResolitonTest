@@ -11,7 +11,8 @@ public class LinePair : MonoBehaviour
     private float currentScale = 0.5f;
     // File for logging
     private string logFile;
-    private bool fineScale;
+
+    const float LINE_MAX = 0.8f;
 
     public void SetCamera(Transform camera)
     {
@@ -19,7 +20,7 @@ public class LinePair : MonoBehaviour
         xrCamera = camera;
     }
 
-    public void MakeLines(float scale = 0.5f)
+    public void MakeLines(float scale = LINE_MAX)
     {
         // Instantiate the line pair
         lines = Instantiate(Resources.Load<GameObject>("HLP"));
@@ -35,8 +36,10 @@ public class LinePair : MonoBehaviour
         lines.transform.Rotate(0, angle, 0);
     }
 
-    public void IncreaseSize()
+    public void IncreaseSize(bool fineScale)
     {
+        // Make sure lines exist
+        if (lines == null) return;
         // Check if fine zoom is enabled (change by 0.001mm)
         if (fineScale)
         {
@@ -48,13 +51,14 @@ public class LinePair : MonoBehaviour
             currentScale += 0.01f;
         }
         // Limit scale up
-        if (currentScale > 0.5f) currentScale = 0.5f;
+        if (currentScale > LINE_MAX) currentScale = LINE_MAX;
         // Apply the current scale
         lines.transform.localScale = new Vector3(1, 1, currentScale);
     }
 
-    public void DecreaseSize()
+    public void DecreaseSize(bool fineScale)
     {
+        if (lines == null) return;
         if (fineScale)
         {
             currentScale -= 0.001f;
@@ -67,15 +71,6 @@ public class LinePair : MonoBehaviour
         if (currentScale < 0f) currentScale = 0f;
         lines.transform.localScale = new Vector3(1, 1, currentScale);
 
-    }
-
-    public void FineTuneEnabled(InputAction.CallbackContext context)
-    {
-        fineScale = true;
-    }
-    public void FineTuneDisabled(InputAction.CallbackContext context)
-    {
-        fineScale = false;
     }
 
     public void keepDistance()

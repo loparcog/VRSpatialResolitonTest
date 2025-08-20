@@ -24,6 +24,8 @@ public class TutorialManager : MonoBehaviour
     private int sceneIndex = 0;
     private GameObject currentScene;
     private LinePair lp;
+    private float[] UpDownTime = { 0, 0 };
+    private bool[] UpDownHeld = { false, false };
 
     void Start()
     {
@@ -58,39 +60,81 @@ public class TutorialManager : MonoBehaviour
     {
         // Set up scene and line pair
         currentScene = (GameObject)Instantiate(Resources.Load("Tutorial Screen"));
-        lp.MakeLines(0.3f);
+        lp.MakeLines(0.5f);
         lp.lines.transform.position = new Vector3(10, 0, 0);
         // Register controls to change the line movement
         RegisterControls();
     }
 
-    void RegisterControls()
+    public void RegisterControls()
     {
-        // Register line changing controls
-        joystickUp.action.performed += IncreaseLPSize;
-        joystickDown.action.performed += DecreaseLPSize;
-        triggerButton.action.started += lp.FineTuneEnabled;
-        triggerButton.action.canceled += lp.FineTuneDisabled;
+        // Joystick scaling
+        joystickUp.action.canceled += StopJUp;
+        joystickUp.action.performed += StartJUp;
+        joystickDown.action.canceled += StopJDown;
+        joystickDown.action.performed += StartJDown;
+    }
+
+    private void StopJUp(InputAction.CallbackContext context)
+    {
+        UpDownHeld[0] = false;
+        UpDownTime[0] = 0;
+    }
+
+    private void StartJUp(InputAction.CallbackContext context)
+    {
+        // Perform base action
+        lp.IncreaseSize(triggerButton.action.inProgress);
+        // Start adding to time
+        UpDownHeld[0] = true;
+    }
+
+    private void StopJDown(InputAction.CallbackContext context)
+    {
+        UpDownHeld[1] = false;
+        UpDownTime[1] = 0;
+    }
+
+    private void StartJDown(InputAction.CallbackContext context)
+    {
+        // Perform base action
+        lp.DecreaseSize(triggerButton.action.inProgress);
+        // Start adding to time
+        UpDownHeld[1] = true;
     }
 
     void DeregisterControls()
     {
         // Remove NextScene button as well
         primaryButton.action.performed -= NextScene;
-        joystickUp.action.performed -= IncreaseLPSize;
-        joystickDown.action.performed -= DecreaseLPSize;
-        triggerButton.action.started -= lp.FineTuneEnabled;
-        triggerButton.action.canceled -= lp.FineTuneDisabled;
+        joystickUp.action.canceled -= StopJUp;
+        joystickUp.action.performed -= StartJUp;
+        joystickDown.action.canceled -= StopJDown;
+        joystickDown.action.performed -= StartJDown;
     }
 
-    void IncreaseLPSize(InputAction.CallbackContext context)
+    void Update()
     {
-        // No check needed here, only used when line pairs are visible
-        lp.IncreaseSize();
-    }
-
-    void DecreaseLPSize(InputAction.CallbackContext context)
-    {
-        lp.DecreaseSize();
+        if (UpDownHeld[0])
+        {
+            // Add delta time (done in seconds)
+            UpDownTime[0] += Time.deltaTime;
+            if (UpDownTime[0] > 0.5)
+            {
+                // Repeatedly increase size
+                lp.IncreaseSize(true);
+            }
+        }
+        // DOWN
+        else if (UpDownHeld[1])
+        {
+            // Add delta time (done in seconds)
+            UpDownTime[1] += Time.deltaTime;
+            if (UpDownTime[1] > 0.5)
+            {
+                // Repeatedly increase size
+                lp.DecreaseSize(true);
+            }
+        }
     }
 }

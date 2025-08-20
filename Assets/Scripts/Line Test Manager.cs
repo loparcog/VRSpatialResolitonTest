@@ -53,40 +53,7 @@ public class LineTestManager : MonoBehaviour
             // Init logging with the line pair tool
             lp.InitLog(dirPath, filePath, UUID);
         }
-        // Set up action bindings
-        primaryButton.action.performed += NextScene;
-        // Joystick scaling
-        joystickUp.action.canceled +=
-            (context) =>
-            {
-                UpDownHeld[0] = false;
-                UpDownTime[0] = 0; 
-            };
-        joystickUp.action.performed +=
-            (context) =>
-            {
-                // Perform base action
-                IncreaseLPSize();
-                // Start adding to time
-                UpDownHeld[0] = true;
-            };
-        joystickDown.action.canceled +=
-            (context) =>
-            {
-                UpDownHeld[1] = false;
-                UpDownTime[1] = 0; 
-            };
-        joystickDown.action.performed +=
-            (context) =>
-            {
-                // Perform base action
-                DecreaseLPSize();
-                // Start adding to time
-                UpDownHeld[1] = true;
-            };
-        // Fine tune triggers
-        triggerButton.action.started += lp.FineTuneEnabled;
-        triggerButton.action.canceled += lp.FineTuneDisabled;
+        RegisterControls();
         // Show the start screen
         currentScene = (GameObject)Instantiate(Resources.Load("Static Screen"));
         // Also instantiate the instruction text
@@ -98,6 +65,45 @@ public class LineTestManager : MonoBehaviour
         instructionText = textObject.GetComponent<TextMeshPro>();
         instructionText.alignment = TextAlignmentOptions.Center;
         instructionText.fontSize = 20;
+    }
+
+    public void RegisterControls()
+    {
+        // Set up action bindings
+        primaryButton.action.performed += NextScene;
+        // Joystick scaling
+        joystickUp.action.canceled += StopJUp;
+        joystickUp.action.performed += StartJUp;
+        joystickDown.action.canceled += StopJDown;
+        joystickDown.action.performed += StartJDown;
+    }
+
+    private void StopJUp(InputAction.CallbackContext context)
+    {
+        UpDownHeld[0] = false;
+        UpDownTime[0] = 0; 
+    }
+    
+    private void StartJUp(InputAction.CallbackContext context)
+    {
+        // Perform base action
+        lp.IncreaseSize(triggerButton.action.inProgress);
+        // Start adding to time
+        UpDownHeld[0] = true;
+    }
+
+    private void StopJDown(InputAction.CallbackContext context)
+    {
+        UpDownHeld[1] = false;
+        UpDownTime[1] = 0;
+    }
+
+    private void StartJDown(InputAction.CallbackContext context)
+    {
+        // Perform base action
+        lp.DecreaseSize(triggerButton.action.inProgress);
+        // Start adding to time
+        UpDownHeld[1] = true;
     }
 
     public void NextScene(InputAction.CallbackContext context)
@@ -124,7 +130,7 @@ public class LineTestManager : MonoBehaviour
                 case "lp":
                     Debug.Log(sceneName);
                     // Screenshot the current camera view
-                    ScreenCapture.CaptureScreenshot(dirPath + "/" + UUID + "-" + sceneIndex + ".png");
+                    //ScreenCapture.CaptureScreenshot(dirPath + "/" + UUID + "-" + sceneIndex + ".png");
                     Debug.Log(dirPath + "/" + UUID + "-" + sceneIndex + ".png");
                     // Write the current data to the text document
                     // Only log head data for dynamic tests
@@ -199,16 +205,6 @@ public class LineTestManager : MonoBehaviour
         }
     }
 
-    private void IncreaseLPSize()
-    {
-        if (scenes[sceneIndex].Split("_")[0] == "lp") lp.IncreaseSize();
-    }
-
-    private void DecreaseLPSize()
-    {
-        if (scenes[sceneIndex].Split("_")[0] == "lp") lp.DecreaseSize();
-        
-    }
     void Update()
     {
         // Keep the current scene at the given position
@@ -224,7 +220,7 @@ public class LineTestManager : MonoBehaviour
             if (UpDownTime[0] > 0.5)
             {
                 // Repeatedly increase size
-                IncreaseLPSize();
+                lp.IncreaseSize(true);
             }
         }
         // DOWN
@@ -235,7 +231,7 @@ public class LineTestManager : MonoBehaviour
             if (UpDownTime[1] > 0.5)
             {
                 // Repeatedly increase size
-                DecreaseLPSize();
+                lp.DecreaseSize(true);
             }
         }
     }
