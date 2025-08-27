@@ -20,9 +20,13 @@ public class TutorialManager : MonoBehaviour
     // 1 > Line pair example
     // 2 > Line pair without toggling
     // 3 > Line pair with toggling
-    private string[] scenes = { "start", "tutorial" };
-    private int sceneIndex = 0;
-    private GameObject currentScene;
+    private enum sceneEnum
+    {
+        start,
+        tutorial
+    }
+    private sceneEnum scene = sceneEnum.start;
+    private GameObject sceneObj;
     private LinePair lp;
     private float[] UpDownTime = { 0, 0 };
     private bool[] UpDownHeld = { false, false };
@@ -34,14 +38,14 @@ public class TutorialManager : MonoBehaviour
         // Only bind the nextScene button
         primaryButton.action.performed += NextScene;
         // Show the initial info screen
-        currentScene = (GameObject)Instantiate(Resources.Load("Start Screen"));
+        sceneObj = (GameObject)Instantiate(Resources.Load("Start Screen"));
     }
 
     public void NextScene(InputAction.CallbackContext context)
     {
 
         // Iterate to the next scene if possible
-        if (sceneIndex == scenes.Length - 1)
+        if (scene == sceneEnum.tutorial)
         {
             // End of scenes, remove controls and continue to the line tester
             DeregisterControls();
@@ -50,16 +54,16 @@ public class TutorialManager : MonoBehaviour
         }
 
         // Destroy the existing scene
-        Destroy(currentScene);
+        Destroy(sceneObj);
         // Iterate the scene index
-        sceneIndex += 1;
+        scene += 1;
         // Set up the new scene
         buildTutorial();
     }
     private void buildTutorial()
     {
         // Set up scene and line pair
-        currentScene = (GameObject)Instantiate(Resources.Load("Tutorial Screen"));
+        sceneObj = (GameObject)Instantiate(Resources.Load("Tutorial Screen"));
         lp.MakeLines(0.5f);
         lp.lines.transform.position = new Vector3(10, 0, 0);
         // Register controls to change the line movement

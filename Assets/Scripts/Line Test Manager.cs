@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using TMPro;
 using Unity.VisualScripting;
 using Unity.XR.CoreUtils;
@@ -22,10 +23,24 @@ public class LineTestManager : MonoBehaviour
     [SerializeField] public InputActionReference joystickDown;
     [SerializeField] public bool logData = false;
     // Scenes, in order
-    private string[] scenes = { "scene_static", "lp_horizontal", "lp_vertical", "lp_diagonal", "scene_dynamic", "lp_horizontal", "head_horizontal", "lp_vertical", "head_vertical", "lp_diagonal", "scene_end" };
-    private int sceneIndex = 0;
+    private enum sceneEnum
+    {
+        scene_static,
+        lp_horizontal,
+        lp_vertical,
+        lp_diagonal,
+        scene_dynamic,
+        lp_dy_horizontal,
+        head_horizontal,
+        lp_dy_vertical,
+        head_vertical,
+        lp_dy_diagonal,
+        scene_end
+
+    }
+    private sceneEnum scene = sceneEnum.scene_static;
     // Tools for current scene management
-    private GameObject currentScene;
+    private GameObject sceneObj;
     private LinePair lp;
     private TextMeshPro instructionText;
     // Tools for line pair scaling
@@ -55,7 +70,7 @@ public class LineTestManager : MonoBehaviour
         }
         RegisterControls();
         // Show the start screen
-        currentScene = (GameObject)Instantiate(Resources.Load("Static Screen"));
+        sceneObj = (GameObject)Instantiate(Resources.Load("Static Screen"));
         // Also instantiate the instruction text
         var textObject = new GameObject();
         textObject.name = "Instruction Text";
@@ -108,9 +123,8 @@ public class LineTestManager : MonoBehaviour
 
     public void NextScene(InputAction.CallbackContext context)
     {
-
         // Iterate to the next scene if possible
-        if (sceneIndex == scenes.Length - 1)
+        if (scene == sceneEnum.scene_end)
         {
             // End of scenes, close application
             Application.Quit();
@@ -120,7 +134,7 @@ public class LineTestManager : MonoBehaviour
         }
 
         // Get the scene name to see if it is a screen or line pair
-        var sceneName = scenes[sceneIndex].Split("_");
+        var sceneName = scene.ToString().Split("_");
 
         // Check if we're logging line pair data
         if (logData)
@@ -131,10 +145,10 @@ public class LineTestManager : MonoBehaviour
                     Debug.Log(sceneName);
                     // Screenshot the current camera view
                     //ScreenCapture.CaptureScreenshot(dirPath + "/" + UUID + "-" + sceneIndex + ".png");
-                    Debug.Log(dirPath + "/" + UUID + "-" + sceneIndex + ".png");
+                    Debug.Log(dirPath + "/" + UUID + "-" + scene.ToString() + ".png");
                     // Write the current data to the text document
                     // Only log head data for dynamic tests
-                    lp.LogData(true, sceneIndex > 4);
+                    lp.LogData(true, scene > sceneEnum.scene_dynamic);
                     break;
                 case "head":
                     // Just log head positioning
@@ -143,10 +157,10 @@ public class LineTestManager : MonoBehaviour
             }
         }
         // Destroy the existing scene
-        Destroy(currentScene);
+        Destroy(sceneObj);
         // Iterate the scene index
-        sceneIndex += 1;
-        sceneName = scenes[sceneIndex].Split("_");
+        scene += 1;
+        sceneName = scene.ToString().Split("_");
         // Set up the new scene
         if (sceneName[0] == "lp")
         {
@@ -175,7 +189,7 @@ public class LineTestManager : MonoBehaviour
     {
         // Set up instruction text
         instructionText.text = "Make the lines as small as possible while still being distinguishable";
-        switch (sceneName[1])
+        switch (sceneName.Last())
         {
             case "horizontal":
                 // No rotation needed
@@ -196,17 +210,17 @@ public class LineTestManager : MonoBehaviour
         instructionText.text = "";
         lp.Remove();
         // Show the right menu based on the name
-        switch (sceneName[1])
+        switch (sceneName.Last())
         {
             case "dynamic":
                 // Enable head tracking
                 staticCamera.SetActive(false);
                 xrOrigin.SetActive(true);
                 // Change parents
-                currentScene = (GameObject)Instantiate(Resources.Load("Dynamic Screen"));
+                sceneObj = (GameObject)Instantiate(Resources.Load("Dynamic Screen"));
                 break;
             case "end":
-                currentScene = (GameObject)Instantiate(Resources.Load("End Screen"));
+                sceneObj = (GameObject)Instantiate(Resources.Load("End Screen"));
                 break;
         }
     }

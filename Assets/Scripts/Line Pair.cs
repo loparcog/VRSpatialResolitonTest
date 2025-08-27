@@ -93,7 +93,7 @@ public class LinePair : MonoBehaviour
             using (StreamWriter sw = new StreamWriter(logFile))
             {
                 // UUID for the user
-                sw.WriteLine("UUID,Static Horizontal,Static Vertical,Static Diagonal,Dynamic Hoizontal,Headpos Horizontal,Negative Headpos Horizontal,Dynamic Vertical,HeadPos Vertical,Negative Headpos Vertical,Dynamic Diagonal,Headpos Diagonal");
+                sw.WriteLine("UUID,Static Horizontal,Static Vertical,Static Diagonal,Dynamic Hoizontal,HeadRot Horizontal,Headpos Horizontal,Dynamic Vertical,HeadRot Vertical,Headpos Vertical,Dynamic Diagonal,Headpos Diagonal");
                 sw.Write(UUID);
             }
         }
@@ -115,8 +115,12 @@ public class LinePair : MonoBehaviour
         {
             // Save the current size of the lines
             if (logLineSize) sw.Write("," + currentScale.ToString("F3") + "mm");
-            // Also save head rotation position (horizontal + vertical)
-            if (logHeadPos) sw.Write("," + xrCamera.localEulerAngles.y.ToString("F3") + "/" + xrCamera.localEulerAngles.x.ToString("F3"));
+            // Also save head rotation (horizontal/vertical) and position (X/Y/Z)
+            if (logHeadPos)
+            {
+                sw.Write("," + xrCamera.localEulerAngles.y.ToString("F3") + "/" + xrCamera.localEulerAngles.x.ToString("F3"));
+                sw.Write("," + xrCamera.localPosition.x.ToString("F3") + "/" + xrCamera.localPosition.y.ToString("F3") + "/" + xrCamera.localPosition.z.ToString("F3"));
+            }
         }
     }
 
