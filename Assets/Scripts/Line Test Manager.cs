@@ -55,6 +55,7 @@ public class LineTestManager : MonoBehaviour
 
     void Start()
     {
+        Debug.Log(Screen.currentResolution);
         // Set up a line pair tool
         lp = this.AddComponent<LinePair>();
         lp.SetCamera(xrCamera);
@@ -129,7 +130,7 @@ public class LineTestManager : MonoBehaviour
             // End of scenes, close application
             Application.Quit();
             // For debug use in the Unity editor
-            EditorApplication.isPlaying = false;
+            // EditorApplication.isPlaying = false;
             return;
         }
 
