@@ -27,13 +27,13 @@ public class LineTestManager : MonoBehaviour
     {
         scene_static,
         lp_horizontal,
+        head_horizontal,
         lp_vertical,
+        head_vertical,
         lp_diagonal,
         scene_dynamic,
         lp_dy_horizontal,
-        head_horizontal,
         lp_dy_vertical,
-        head_vertical,
         lp_dy_diagonal,
         scene_end
 
@@ -152,8 +152,8 @@ public class LineTestManager : MonoBehaviour
                     lp.LogData(true, scene > sceneEnum.scene_dynamic);
                     break;
                 case "head":
-                    // Just log head positioning
-                    lp.LogData(false, true);
+                    // Move line pair to defined position to test head movement
+                    
                     break;
             }
         }

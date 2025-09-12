@@ -65,5 +65,5 @@
     "explorer.fileNesting.patterns": {
         "*.sln": "*.csproj"
     },
-    "dotnet.defaultSolution": "VRSpatialResolitonTest.sln"
+    "dotnet.defaultSolution": "VR Spatial Resolution Tester.sln"
 }
