@@ -12,7 +12,7 @@ public class LinePair : MonoBehaviour
     // File for logging
     private string logFile;
 
-    const float LINE_MAX = 0.8f;
+    const float LINE_MAX = 1.0f;
 
     public void SetCamera(Transform camera)
     {
@@ -23,12 +23,17 @@ public class LinePair : MonoBehaviour
     public void MakeLines(float scale = LINE_MAX)
     {
         // Instantiate the line pair
+        /*
+            HLP = Standard
+            HLP Box = Capped ends
+            HLP Infinite = Infinitely long lines
+        */
         lines = Instantiate(Resources.Load<GameObject>("HLP"));
         lines.name = "Line Pairs";
         // Reset the current scale
         currentScale = scale;
         // Scale the scene to match the scale point
-        lines.transform.localScale = new Vector3(1, 1, currentScale);
+        UpdateSize();
     }
 
     public void RotateTo(float angle)
@@ -53,7 +58,7 @@ public class LinePair : MonoBehaviour
         // Limit scale up
         if (currentScale > LINE_MAX) currentScale = LINE_MAX;
         // Apply the current scale
-        lines.transform.localScale = new Vector3(1, 1, currentScale);
+        UpdateSize();
     }
 
     public void DecreaseSize(bool fineScale)
@@ -69,8 +74,13 @@ public class LinePair : MonoBehaviour
         }
         // Limit scale down
         if (currentScale < 0f) currentScale = 0f;
-        lines.transform.localScale = new Vector3(1, 1, currentScale);
+        UpdateSize();
+    }
 
+    public void UpdateSize()
+    {
+        //lines.transform.localScale = new Vector3(1, 1, currentScale); // FOR WIDTH RESIZING
+        lines.transform.localScale = new Vector3(currentScale, 1, currentScale); // FOR WIDTH AND LENGTH RESIZING
     }
 
     public void keepDistance()

@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using JetBrains.Annotations;
 using TMPro;
 using Unity.VisualScripting;
 using Unity.XR.CoreUtils;
@@ -25,6 +26,7 @@ public class LineTestManager : MonoBehaviour
     // Scenes, in order
     private enum sceneEnum
     {
+        scene_user,
         scene_static,
         lp_horizontal,
         head_horizontal,
@@ -38,13 +40,15 @@ public class LineTestManager : MonoBehaviour
         scene_end
 
     }
-    private sceneEnum scene = sceneEnum.scene_static;
+    private sceneEnum scene = 0;
     // Tools for current scene management
     private GameObject sceneObj;
     private LinePair lp;
     private TextMeshPro instructionText;
+    private TextMeshPro eyeText;
+    private int eyeVal = 20;
     // Tools for line pair scaling
-    private float[] UpDownTime = {0, 0};
+    private float[] UpDownTime = { 0, 0 };
     private bool[] UpDownHeld = {false, false};
     // Data for screenshotting and file writing
     private string UUID = System.Guid.NewGuid().ToString();
@@ -70,8 +74,10 @@ public class LineTestManager : MonoBehaviour
             lp.InitLog(dirPath, filePath, UUID);
         }
         RegisterControls();
-        // Show the start screen
-        sceneObj = (GameObject)Instantiate(Resources.Load("Static Screen"));
+        // Show the user initialization screen
+        sceneObj = (GameObject)Instantiate(Resources.Load("User Init Screen"));
+        // Set up the user init screen
+        SetUpUserInitMenu();
         // Also instantiate the instruction text
         var textObject = new GameObject();
         textObject.name = "Instruction Text";
@@ -83,10 +89,35 @@ public class LineTestManager : MonoBehaviour
         instructionText.fontSize = 20;
     }
 
-    public void RegisterControls()
+    public void SetUpUserInitMenu()
+    {
+        // Set text to UUID
+        var uuidText = GameObject.Find("UUID").GetComponent<TextMeshPro>().text = UUID;
+        eyeText = GameObject.Find("Eye Score").GetComponent<TextMeshPro>();
+        // Set up basic controls
+        RegisterInitControls();
+        // Set eye value
+        eyeText.text = "20/" + eyeVal;
+        
+    }
+
+    public void RegisterInitControls()
     {
         // Set up action bindings
         primaryButton.action.performed += NextScene;
+        // Change prescription numbers with joysticks
+        joystickUp.action.performed += EyeUp;
+        joystickDown.action.performed += EyeDown;    
+    }
+
+    public void DeregisterInitControls()
+    {
+        joystickUp.action.performed -= EyeUp;
+        joystickDown.action.performed -= EyeDown;  
+    }
+
+    public void RegisterControls()
+    {
         // Joystick scaling
         joystickUp.action.canceled += StopJUp;
         joystickUp.action.performed += StartJUp;
@@ -94,10 +125,22 @@ public class LineTestManager : MonoBehaviour
         joystickDown.action.performed += StartJDown;
     }
 
+    private void EyeUp(InputAction.CallbackContext context)
+    {
+        eyeVal += 5;
+        eyeText.text = "20/" + eyeVal;
+    }
+
+    private void EyeDown(InputAction.CallbackContext context)
+    {
+        eyeVal -= 5;
+        eyeText.text = "20/" + eyeVal;
+    }
+
     private void StopJUp(InputAction.CallbackContext context)
     {
         UpDownHeld[0] = false;
-        UpDownTime[0] = 0; 
+        UpDownTime[0] = 0;
     }
     
     private void StartJUp(InputAction.CallbackContext context)
@@ -213,6 +256,9 @@ public class LineTestManager : MonoBehaviour
         // Show the right menu based on the name
         switch (sceneName.Last())
         {
+            case "static":
+            sceneObj = (GameObject)Instantiate(Resources.Load("Static Screen"));
+                break;
             case "dynamic":
                 // Enable head tracking
                 staticCamera.SetActive(false);
@@ -229,7 +275,7 @@ public class LineTestManager : MonoBehaviour
     void Update()
     {
         // Keep the current scene at the given position
-        lp.keepDistance();
+        // lp.keepDistance();
         // Also update the line text
         instructionText.transform.position = new Vector3(0, -xrCamera.localPosition.z, 15);
         // Check for held values
