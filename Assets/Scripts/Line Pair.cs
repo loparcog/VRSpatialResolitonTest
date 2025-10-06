@@ -7,8 +7,8 @@ public class LinePair : MonoBehaviour
     // Horizontal line pair (1mm lines)
     public GameObject lines;
     private Transform xrCamera;
-    // Current scale
-    private float currentScale = 0.5f;
+    // Current scale, accessible for writing to logs
+    public float currentScale = 0.5f;
     // File for logging
     private string logFile;
 
@@ -20,7 +20,7 @@ public class LinePair : MonoBehaviour
         xrCamera = camera;
     }
 
-    public void MakeLines(float scale = LINE_MAX)
+    public void MakeLines(string lineType, float scale = LINE_MAX)
     {
         // Instantiate the line pair
         /*
@@ -28,7 +28,7 @@ public class LinePair : MonoBehaviour
             HLP Box = Capped ends
             HLP Infinite = Infinitely long lines
         */
-        lines = Instantiate(Resources.Load<GameObject>("HLP"));
+        lines = Instantiate(Resources.Load<GameObject>(lineType));
         lines.name = "Line Pairs";
         // Reset the current scale
         currentScale = scale;
@@ -79,14 +79,15 @@ public class LinePair : MonoBehaviour
 
     public void UpdateSize()
     {
-        //lines.transform.localScale = new Vector3(1, 1, currentScale); // FOR WIDTH RESIZING
-        lines.transform.localScale = new Vector3(currentScale, 1, currentScale); // FOR WIDTH AND LENGTH RESIZING
+        lines.transform.localScale = new Vector3(1, 1, currentScale); // FOR WIDTH RESIZING ONLY
+        //lines.transform.localScale = new Vector3(currentScale, 1, currentScale); // FOR WIDTH AND LENGTH RESIZING
     }
 
     public void keepDistance()
     {
         if (lines)
         {
+            // Requires SetCamera() to be run beforehand
             lines.transform.position = new Vector3(0, -xrCamera.localPosition.z, 0);
         }
     }

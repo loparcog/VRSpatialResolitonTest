@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
@@ -173,7 +174,7 @@ public class LineTestManager : MonoBehaviour
             // End of scenes, close application
             Application.Quit();
             // For debug use in the Unity editor
-            // EditorApplication.isPlaying = false;
+            //EditorApplication.isPlaying = false;
             return;
         }
 
@@ -237,7 +238,7 @@ public class LineTestManager : MonoBehaviour
         {
             case "horizontal":
                 // No rotation needed
-                lp.MakeLines();
+                lp.MakeLines("HLP");
                 break;
             case "vertical":
                 lp.RotateTo(90);

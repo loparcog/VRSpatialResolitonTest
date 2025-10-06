@@ -18,8 +18,6 @@ public class TutorialManager : MonoBehaviour
     // Tutorial scene index
     // 0 > Start screen
     // 1 > Line pair example
-    // 2 > Line pair without toggling
-    // 3 > Line pair with toggling
     private enum sceneEnum
     {
         start,
@@ -49,7 +47,7 @@ public class TutorialManager : MonoBehaviour
         {
             // End of scenes, remove controls and continue to the line tester
             DeregisterControls();
-            SceneManager.LoadScene(1);
+            //SceneManager.LoadScene(1);
             return;
         }
 
@@ -64,7 +62,7 @@ public class TutorialManager : MonoBehaviour
     {
         // Set up scene and line pair
         sceneObj = (GameObject)Instantiate(Resources.Load("Tutorial Screen"));
-        lp.MakeLines(0.5f);
+        lp.MakeLines("HLP", 0.5f);
         lp.lines.transform.position = new Vector3(10, 0, 0);
         // Register controls to change the line movement
         RegisterControls();
