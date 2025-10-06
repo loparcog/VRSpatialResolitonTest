@@ -16,7 +16,6 @@ public class SceneController : MonoBehaviour
     [SerializeField] public InputActionReference triggerButton;
     [SerializeField] public InputActionReference joystickUp;
     [SerializeField] public InputActionReference joystickDown;
-    [SerializeField] public bool logData = false;
     private SceneBasis[] sceneList;
     private InputActionReference[] controllerButtons;
     private int sceneIndex = 0;
