@@ -8,8 +8,6 @@ public class LinePair : MonoBehaviour
     private Transform xrCamera;
     // Current scale, accessible for writing to logs
     public float currentScale = 0.5f;
-    // File for logging
-    private string logFile;
 
     const float LINE_MAX = 1.0f;
 
@@ -88,49 +86,6 @@ public class LinePair : MonoBehaviour
         {
             // Requires SetCamera() to be run beforehand
             lines.transform.position = new Vector3(0, -xrCamera.localPosition.z, 0);
-        }
-    }
-
-    public void InitLog(string dirPath, string filePath, string UUID)
-    {
-        // Store the file path for future logging
-        logFile = filePath;
-        // Make sure the screenshot folder and text document exists
-        if (!Directory.Exists(dirPath)) Directory.CreateDirectory(dirPath);
-        if (!File.Exists(logFile))
-        {
-            // Set up the CSV
-            using (StreamWriter sw = new StreamWriter(logFile))
-            {
-                // UUID for the user
-                sw.WriteLine("UUID,Static Horizontal,Static Vertical,Static Diagonal,Dynamic Hoizontal,HeadRot Horizontal,Headpos Horizontal,Dynamic Vertical,HeadRot Vertical,Headpos Vertical,Dynamic Diagonal,Headpos Diagonal");
-                sw.Write(UUID);
-            }
-        }
-        else
-        {
-            // Just write the UUID
-            using (StreamWriter sw = File.AppendText(logFile))
-            {
-                sw.Write("\n" + UUID);
-            }
-        }
-        Debug.Log("Data being saved to: " + logFile);
-    }
-
-    public void LogData(bool logLineSize, bool logHeadPos)
-    {
-        // Write to the stored log file path
-        using (StreamWriter sw = File.AppendText(logFile))
-        {
-            // Save the current size of the lines
-            if (logLineSize) sw.Write("," + currentScale.ToString("F3") + "mm");
-            // Also save head rotation (horizontal/vertical) and position (X/Y/Z)
-            if (logHeadPos)
-            {
-                sw.Write("," + xrCamera.localEulerAngles.y.ToString("F3") + "/" + xrCamera.localEulerAngles.x.ToString("F3"));
-                sw.Write("," + xrCamera.localPosition.x.ToString("F3") + "/" + xrCamera.localPosition.y.ToString("F3") + "/" + xrCamera.localPosition.z.ToString("F3"));
-            }
         }
     }
 

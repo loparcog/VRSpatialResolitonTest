@@ -51,7 +51,7 @@ public class SceneController : MonoBehaviour
         if (sceneIndex >= sceneList.Length)
         {
             // For debug use in the Unity editor
-            UnityEditor.EditorApplication.isPlaying = false;
+            // UnityEditor.EditorApplication.isPlaying = false;
             // End the program here
             Application.Quit();
             return;

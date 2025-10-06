@@ -688,7 +688,6 @@ MonoBehaviour:
   triggerButton: {fileID: -5874932509919229387, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   joystickUp: {fileID: 127311413498606810, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   joystickDown: {fileID: 7198656946504207780, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  logData: 0
 --- !u!1001 &1877012585
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -743,7 +742,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6598815579406187037, guid: 18ddb545287c546e19cc77dc9fbb2189, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -5,10 +5,10 @@ public class LogController
 {
     public static void Init(string UUID)
     {
-        if (!File.Exists(Constants.LOGFILE))
+        if (!File.Exists(Application.persistentDataPath + "/" + Constants.LOGFILE))
         {
             // Set up the CSV
-            using (StreamWriter sw = new StreamWriter(Constants.LOGFILE))
+            using (StreamWriter sw = new StreamWriter(Application.persistentDataPath + "/" + Constants.LOGFILE))
             {
                 // UUID for the user
                 sw.WriteLine("UUID,Eye Left,Eye Right,IPD,Glasses," +
@@ -23,18 +23,18 @@ public class LogController
         else
         {
             // Just write the UUID as a new line in the file
-            using (StreamWriter sw = File.AppendText(Constants.LOGFILE))
+            using (StreamWriter sw = File.AppendText(Application.persistentDataPath + "/" + Constants.LOGFILE))
             {
                 sw.Write("\n" + UUID);
             }
         }
-        Debug.Log("Data being saved to: " + Constants.LOGFILE);
+        Debug.Log("Data being saved to: " + Application.persistentDataPath + "/" + Constants.LOGFILE);
     }
 
     public static void LogUserData(int leftEye, int rightEye, int IPD, int glasses)
     {
         // Write to the stored log file path
-        using (StreamWriter sw = File.AppendText(Constants.LOGFILE))
+        using (StreamWriter sw = File.AppendText(Application.persistentDataPath + "/" + Constants.LOGFILE))
         {
             // Write all formatted data to the line
             sw.Write(",20/" + leftEye +
@@ -42,13 +42,12 @@ public class LogController
                 "," + IPD + "mm" +
                 "," + glasses);
         }
-        Debug.Log("File logged");
     }
 
     public static void LogLineData(float lineScale, Transform xrCamera = null)
     {
         // Write to the stored log file path
-        using (StreamWriter sw = File.AppendText(Constants.LOGFILE))
+        using (StreamWriter sw = File.AppendText(Application.persistentDataPath + "/" + Constants.LOGFILE))
         {
             // Save the current size of the lines
             sw.Write("," + lineScale.ToString("F3") + "mm");

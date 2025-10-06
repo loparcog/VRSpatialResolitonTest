@@ -6,11 +6,8 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/Start and Tutorial.unity
-    guid: 7da5174d00874294f8bc6ddc2f76a7c3
-  - enabled: 1
-    path: Assets/Scenes/Line Pairs.unity
-    guid: 8ddc49393b59e96428c221e0b23e624e
+    path: Assets/Scenes/Scene Basis.unity
+    guid: cd41e8e1e50b1be42a37915b5fb7b748
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: c82cb403dba951347b5c739c3168cd9e, type: 2}
