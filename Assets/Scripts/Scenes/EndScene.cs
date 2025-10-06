@@ -1,14 +1,10 @@
-using System.Collections.Generic;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Unity.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.XR.Interaction.Toolkit.Inputs;
 
-public class StartScene : SceneBasis
+public class EndScene : SceneBasis
 {
-    public StartScene(InputActionReference[] controls) :
-        base(Resources.Load("Start Screen"), controls) { }
+    public EndScene(InputActionReference[] controls) :
+        base(Resources.Load("End Screen"), controls) { }
     public override void RegisterControls()
     {
         // Set the destruction flag

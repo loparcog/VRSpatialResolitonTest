@@ -14,6 +14,7 @@ public class DynamicLineScene : SceneBasis
     // Tools for line pair scaling
     private float[] UpDownTime = { 0, 0 };
     private bool[] UpDownHeld = { false, false };
+    private int[] textXYpos = {0,0};
     // Base object to add line pair system to
     private GameObject baseObject;
     // Camera references
@@ -96,22 +97,23 @@ public class DynamicLineScene : SceneBasis
         instructionText.text = "Make the lines as small as possible while still being distinguishable";
         if (currTest > 0)
         {
-            LogController.LogLineData(dynamicLinePair.currentScale);
+            LogController.LogLineData(dynamicLinePair.currentScale, xrCamera);
         }
         switch (currTest)
         {
             case 0:
                 // No rotation needed
                 dynamicLinePair.MakeLines("HLP Infinite");
-                instructionText.transform.position = new Vector3(0, 0, 15);
+                textXYpos[1] = 15;
                 break;
             case 1:
                 dynamicLinePair.RotateTo(90);
-                instructionText.transform.position = new Vector3(-20, 0, 0);
+                textXYpos[0] = -20;
+                textXYpos[1] = 0;
                 break;
             case 2:
                 dynamicLinePair.RotateTo(45);
-                instructionText.transform.position = new Vector3(-20, 0, 15);
+                textXYpos[1] = 15;
                 break;
             default:
                 // Scene finished, toggle flag
@@ -155,7 +157,7 @@ public class DynamicLineScene : SceneBasis
         // Keep the current scene at the given position
         dynamicLinePair.keepDistance();
         // Also update the line text
-        instructionText.transform.position = new Vector3(0, -xrCamera.localPosition.z, 15);
+        instructionText.transform.position = new Vector3(textXYpos[0], -xrCamera.localPosition.z, textXYpos[1]);
         // Check for held values
         // UP
         if (UpDownHeld[0])

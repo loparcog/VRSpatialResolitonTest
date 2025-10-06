@@ -1,7 +1,3 @@
-
-using Unity.VisualScripting;
-using Unity.XR.CoreUtils;
-using UnityEditor.SearchService;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -40,6 +36,7 @@ public class SceneController : MonoBehaviour
             new UserDataScene(controllerButtons, UUID),
             new StaticLineScene(controllerButtons),
             new DynamicLineScene(controllerButtons, staticCamera, xrCamera, xrOrigin),
+            new EndScene(controllerButtons),
         };
         print(sceneList);
         // Build the first scene
@@ -51,12 +48,12 @@ public class SceneController : MonoBehaviour
     void ConstructScene()
     {
         // Make sure the scene exists
-        if (sceneIndex > sceneList.Length)
+        if (sceneIndex >= sceneList.Length)
         {
-            // End the program here
-            Application.Quit();
             // For debug use in the Unity editor
             UnityEditor.EditorApplication.isPlaying = false;
+            // End the program here
+            Application.Quit();
             return;
         }
         sceneList[sceneIndex].Start();

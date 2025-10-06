@@ -1,7 +1,4 @@
-
-
 using System.IO;
-using UnityEditor;
 using UnityEngine;
 
 public class LogController
@@ -14,7 +11,7 @@ public class LogController
             using (StreamWriter sw = new StreamWriter(Constants.LOGFILE))
             {
                 // UUID for the user
-                sw.WriteLine("UUID,Eye Left,Eye Right,IPD," +
+                sw.WriteLine("UUID,Eye Left,Eye Right,IPD,Glasses," +
                     "Static Horizontal,Static Vertical,Static Diagonal," +
                     "Dynamic Hoizontal,Head Rotation Horizontal,Head Position Horizontal," +
                     "Dynamic Vertical,Head Rotation Vertical,Head Position Vertical," +
@@ -44,7 +41,8 @@ public class LogController
                 ",20/" + rightEye +
                 "," + IPD + "mm" +
                 "," + glasses);
-        }      
+        }
+        Debug.Log("File logged");
     }
 
     public static void LogLineData(float lineScale, Transform xrCamera = null)
@@ -55,7 +53,7 @@ public class LogController
             // Save the current size of the lines
             sw.Write("," + lineScale.ToString("F3") + "mm");
             // Also save head rotation (horizontal/vertical) and position (X/Y/Z)
-            if (xrCamera)
+            if (xrCamera != null)
             {
                 sw.Write("," + xrCamera.localEulerAngles.y.ToString("F3") + "/" + xrCamera.localEulerAngles.x.ToString("F3"));
                 sw.Write("," + xrCamera.localPosition.x.ToString("F3") + "/" + xrCamera.localPosition.y.ToString("F3") + "/" + xrCamera.localPosition.z.ToString("F3"));

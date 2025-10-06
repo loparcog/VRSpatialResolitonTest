@@ -1,6 +1,5 @@
 using System.IO;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class LinePair : MonoBehaviour
 {
