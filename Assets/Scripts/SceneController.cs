@@ -9,9 +9,11 @@ public class SceneController : MonoBehaviour
     [SerializeField] public Transform xrCamera;
     // Controller input actions
     [SerializeField] public InputActionReference primaryButton;
+    [SerializeField] public InputActionReference secondaryButton;
     [SerializeField] public InputActionReference triggerButton;
     [SerializeField] public InputActionReference joystickUp;
     [SerializeField] public InputActionReference joystickDown;
+    private LogController log = new LogController();
     private SceneBasis[] sceneList;
     private InputActionReference[] controllerButtons;
     private int sceneIndex = 0;
@@ -27,18 +29,20 @@ public class SceneController : MonoBehaviour
             joystickUp,
             joystickDown,
             primaryButton,
+            secondaryButton,
             triggerButton
         };
         // Initialize the scene list
         sceneList = new SceneBasis[] {
             new StartScene(controllerButtons),
             new TutorialScene(controllerButtons),
-            new UserDataScene(controllerButtons, UUID),
-            new StaticLineScene(controllerButtons),
-            new DynamicLineScene(controllerButtons, staticCamera, xrCamera, xrOrigin),
-            new EndScene(controllerButtons),
+            new UserDataScene(controllerButtons, log, UUID),
+            new StaticLineScene(controllerButtons, log),
+            new DynamicLineScene(controllerButtons, log, staticCamera, xrCamera, xrOrigin),
+            new EndScene(controllerButtons, log),
         };
-        print(sceneList);
+        // Initialize the log with the user UUID
+        log.Init(UUID);
         // Build the first scene
         ConstructScene();
 
@@ -52,7 +56,7 @@ public class SceneController : MonoBehaviour
         {
             // For debug use in the Unity editor
             // UnityEditor.EditorApplication.isPlaying = false;
-            // End the program here
+            // End the program here if you'd like
             Application.Quit();
             return;
         }
@@ -67,10 +71,17 @@ public class SceneController : MonoBehaviour
         // See if the deletion flag is open
         if (cS.toDestroy)
         {
+            // See which direction to go for the scene
+            if (cS.goBack)
+            {
+                sceneIndex--;
+            }
+            else
+            {
+                sceneIndex++;
+            }
             // Run the destroy function
             cS.Destroy();
-            // Iterate to the next scene
-            sceneIndex++;
             // Construct the new scene
             ConstructScene();
         }

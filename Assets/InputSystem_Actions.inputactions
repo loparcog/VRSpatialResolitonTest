@@ -996,15 +996,6 @@
             "id": "3b409bc3-8b36-43bb-b52b-29d92c30b196",
             "actions": [
                 {
-                    "name": "Right Primary Button",
-                    "type": "Button",
-                    "id": "2ab50055-adb3-44af-a367-83b98d6051c0",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
                     "name": "Right Trigger",
                     "type": "Button",
                     "id": "7b0c2f0a-0180-4164-b06c-6b14f57de09a",
@@ -1030,6 +1021,24 @@
                     "processors": "",
                     "interactions": "Sector(directions=2)",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "Right Secondary Button",
+                    "type": "Button",
+                    "id": "b997ce53-5b5d-4eb3-8f69-c8515473bb55",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Right Primary Button",
+                    "type": "Button",
+                    "id": "2ab50055-adb3-44af-a367-83b98d6051c0",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -1074,6 +1083,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Right Joystick Down",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d5bae2cc-8f85-49ac-aa8c-e26fbc2b787d",
+                    "path": "<XRController>{RightHand}/{SecondaryButton}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Right Secondary Button",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

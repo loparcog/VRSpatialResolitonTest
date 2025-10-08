@@ -6,7 +6,16 @@ public class Constants
         UP,
         DOWN,
         BUTTON,
+        SECONDBUTTON,
         TRIGGER
+    }
+
+    // LINE ORGANIZATION ENUM
+    public enum LINE_ORIENTATION
+    {
+        HORIZONTAL,
+        VERTICAL,
+        DIAGONAL
     }
 
     // LOG DATA LOCATION

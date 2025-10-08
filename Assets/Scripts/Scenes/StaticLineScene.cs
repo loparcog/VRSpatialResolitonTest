@@ -6,7 +6,7 @@ public class StaticLineScene : SceneBasis
 {
     // Current test index
     // 0 = Horizontal, 1 = Vertical, 2 = Diagonal
-    private int currTest = 0;
+    private Constants.LINE_ORIENTATION currTest = 0;
     // Line pair object
     private LinePair staticLinePair;
     // Instructions for line scaling
@@ -16,9 +16,14 @@ public class StaticLineScene : SceneBasis
     private bool[] UpDownHeld = { false, false };
     // Base object to add line pair system to
     private GameObject baseObject;
+    private LogController log;
 
-    public StaticLineScene(InputActionReference[] controls) :
-        base(Resources.Load("Static Screen"), controls) { }
+    public StaticLineScene(InputActionReference[] controls, LogController logger) :
+        base(Resources.Load("Static Screen"), controls)
+    {
+        // Save the log resource
+        log = logger;
+    }
 
     public override void Start()
     {
@@ -35,6 +40,7 @@ public class StaticLineScene : SceneBasis
     public override void Destroy()
     {
         base.Destroy();
+        currTest = 0;
         // Remove all created game objects
         staticLinePair.Remove();
         Object.Destroy(baseObject);
@@ -47,13 +53,14 @@ public class StaticLineScene : SceneBasis
         textObject.name = "Instruction Text";
         textObject.AddComponent<TextMeshPro>();
         textObject.transform.Rotate(90, 0, 0);
-        textObject.GetComponent<RectTransform>().sizeDelta = new Vector2(30, 5);
+        textObject.GetComponent<RectTransform>().sizeDelta = new Vector2(20, 5);
         instructionText = textObject.GetComponent<TextMeshPro>();
         instructionText.alignment = TextAlignmentOptions.Center;
         instructionText.fontSize = 20;
     }
     public override void RegisterControls()
     {
+        base.RegisterControls();
         // Next scene
         controllerButtons[(int)Constants.CONTROLS.BUTTON].action.performed += NextTest;
         // Joystick line scaling
@@ -64,6 +71,7 @@ public class StaticLineScene : SceneBasis
     }
     public override void DeregisterControls()
     {
+        base.DeregisterControls();
         // REMOVE EVERYTHING THAT WAS SET ABOVE
         controllerButtons[(int)Constants.CONTROLS.BUTTON].action.performed -= NextTest;
         controllerButtons[(int)Constants.CONTROLS.UP].action.canceled -= StopJUp;
@@ -81,23 +89,23 @@ public class StaticLineScene : SceneBasis
         // If we're past the base case, log the data
         if (currTest > 0)
         {
-            LogController.LogLineData(staticLinePair.currentScale);
+            log.LogLineData(staticLinePair.currentScale, currTest - 1);
         }
         
         switch (currTest)
         {
-            case 0:
+            case Constants.LINE_ORIENTATION.HORIZONTAL:
                 // No rotation needed
-                staticLinePair.MakeLines("HLP Infinite");
-                instructionText.transform.position = new Vector3(0, 0, 15);
+                staticLinePair.MakeLines("HLP Infinite", 0.5f);
+                instructionText.transform.position = new Vector3(0, 0, 10);
                 break;
-            case 1:
+            case Constants.LINE_ORIENTATION.VERTICAL:
                 staticLinePair.RotateTo(90);
-                instructionText.transform.position = new Vector3(-20, 0, 0);
+                instructionText.transform.position = new Vector3(-15, 0, 0);
                 break;
-            case 2:
+            case Constants.LINE_ORIENTATION.DIAGONAL:
                 staticLinePair.RotateTo(45);
-                instructionText.transform.position = new Vector3(-20, 0, 15);
+                instructionText.transform.position = new Vector3(-10, 0, 10);
                 break;
             default:
                 // Scene finished, toggle flag

@@ -6,7 +6,7 @@ public class DynamicLineScene : SceneBasis
 {
     // Current test index
     // 0 = Horizontal, 1 = Vertical, 2 = Diagonal
-    private int currTest = 0;
+    private Constants.LINE_ORIENTATION currTest = Constants.LINE_ORIENTATION.HORIZONTAL;
     // Line pair object
     private LinePair dynamicLinePair;
     // Instructions for line scaling
@@ -21,16 +21,20 @@ public class DynamicLineScene : SceneBasis
     private GameObject staticCamera;
     private Transform xrCamera;
     private GameObject xrOrigin;
+    // Log reference
+    private LogController log;
 
 
 
-    public DynamicLineScene(InputActionReference[] controls, GameObject staticCam, Transform dynamicCam, GameObject xrO) :
+    public DynamicLineScene(InputActionReference[] controls, LogController logger, GameObject staticCam, Transform dynamicCam, GameObject xrO) :
         base(Resources.Load("Dynamic Screen"), controls)
     {
         // Save camera references for later use
         staticCamera = staticCam;
         xrCamera = dynamicCam;
         xrOrigin = xrO;
+        // Reference to the logging machine
+        log = logger;
     }
     
     public override void Start()
@@ -52,6 +56,9 @@ public class DynamicLineScene : SceneBasis
     public override void Destroy()
     {
         base.Destroy();
+        staticCamera.SetActive(true);
+        xrOrigin.SetActive(false);
+        currTest = 0;
         // Remove all created game objects
         dynamicLinePair.Remove();
         Object.Destroy(baseObject);
@@ -64,13 +71,14 @@ public class DynamicLineScene : SceneBasis
         textObject.name = "Instruction Text";
         textObject.AddComponent<TextMeshPro>();
         textObject.transform.Rotate(90, 0, 0);
-        textObject.GetComponent<RectTransform>().sizeDelta = new Vector2(30, 5);
+        textObject.GetComponent<RectTransform>().sizeDelta = new Vector2(20, 5);
         instructionText = textObject.GetComponent<TextMeshPro>();
         instructionText.alignment = TextAlignmentOptions.Center;
         instructionText.fontSize = 20;
     }
     public override void RegisterControls()
     {
+        base.RegisterControls();
         // Next scene
         controllerButtons[(int)Constants.CONTROLS.BUTTON].action.performed += NextTest;
         // Joystick line scaling
@@ -81,6 +89,7 @@ public class DynamicLineScene : SceneBasis
     }
     public override void DeregisterControls()
     {
+        base.DeregisterControls();
         // REMOVE EVERYTHING THAT WAS SET ABOVE
         controllerButtons[(int)Constants.CONTROLS.BUTTON].action.performed -= NextTest;
         controllerButtons[(int)Constants.CONTROLS.UP].action.canceled -= StopJUp;
@@ -97,23 +106,24 @@ public class DynamicLineScene : SceneBasis
         instructionText.text = "Make the lines as small as possible while still being distinguishable";
         if (currTest > 0)
         {
-            LogController.LogLineData(dynamicLinePair.currentScale, xrCamera);
+            log.LogLineData(dynamicLinePair.currentScale, currTest - 1, xrCamera);
         }
         switch (currTest)
         {
-            case 0:
+            case Constants.LINE_ORIENTATION.HORIZONTAL:
                 // No rotation needed
-                dynamicLinePair.MakeLines("HLP Infinite");
-                textXYpos[1] = 15;
+                dynamicLinePair.MakeLines("HLP Infinite", 0.5f);
+                textXYpos[1] = 10;
                 break;
-            case 1:
+            case Constants.LINE_ORIENTATION.VERTICAL:
                 dynamicLinePair.RotateTo(90);
-                textXYpos[0] = -20;
+                textXYpos[0] = -15;
                 textXYpos[1] = 0;
                 break;
-            case 2:
+            case Constants.LINE_ORIENTATION.DIAGONAL:
                 dynamicLinePair.RotateTo(45);
-                textXYpos[1] = 15;
+                textXYpos[0] = -10;
+                textXYpos[1] = 10;
                 break;
             default:
                 // Scene finished, toggle flag

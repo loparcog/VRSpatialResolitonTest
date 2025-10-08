@@ -685,6 +685,7 @@ MonoBehaviour:
   xrOrigin: {fileID: 134278399}
   xrCamera: {fileID: 503562132}
   primaryButton: {fileID: -8446603351089622980, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  secondaryButton: {fileID: -1608718939675748170, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   triggerButton: {fileID: -5874932509919229387, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   joystickUp: {fileID: 127311413498606810, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   joystickDown: {fileID: 7198656946504207780, guid: 052faaac586de48259a63d0c4782560b, type: 3}

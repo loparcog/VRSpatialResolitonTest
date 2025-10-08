@@ -9,6 +9,7 @@ public abstract class SceneBasis
     public InputActionReference[] controllerButtons;
 
     public bool toDestroy = false;
+    public bool goBack = false;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public SceneBasis(Object scene, InputActionReference[] controls)
     {
@@ -21,6 +22,13 @@ public abstract class SceneBasis
     public void ToggleDestroyFlag(InputAction.CallbackContext context)
     {
         toDestroy = true;
+    }
+
+    public void ToggleBackwardsDestroyFlag(InputAction.CallbackContext context)
+    {
+        // Destroy and set backwards flag
+        toDestroy = true;
+        goBack = true;
     }
 
     // For manual use
@@ -37,8 +45,14 @@ public abstract class SceneBasis
         activeScene = (GameObject)Object.Instantiate(sceneObject);
     }
 
-    public abstract void RegisterControls();
-    public abstract void DeregisterControls();
+    public virtual void RegisterControls()
+    {
+        controllerButtons[(int)Constants.CONTROLS.SECONDBUTTON].action.performed += ToggleBackwardsDestroyFlag;
+    }
+    public virtual void DeregisterControls()
+    {
+        controllerButtons[(int)Constants.CONTROLS.SECONDBUTTON].action.performed -= ToggleBackwardsDestroyFlag;
+    }
 
     // Update is called once per frame
     public virtual void Update()
@@ -49,6 +63,9 @@ public abstract class SceneBasis
     // Destroy scene and dereference controls
     public virtual void Destroy()
     {
+        // Turn off the go back and destroy flags
+        goBack = false;
+        toDestroy = false;
         // By default, just call the deregister function
         DeregisterControls();
         Object.Destroy(activeScene);

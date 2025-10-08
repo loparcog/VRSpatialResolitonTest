@@ -23,6 +23,7 @@ public class TutorialScene : SceneBasis
     }
     public override void RegisterControls()
     {
+        base.RegisterControls();
         // Joystick scaling for the example line pair
         controllerButtons[(int)Constants.CONTROLS.BUTTON].action.performed += ToggleDestroyFlag;
         controllerButtons[(int)Constants.CONTROLS.UP].action.canceled += StopJUp;
@@ -60,6 +61,7 @@ public class TutorialScene : SceneBasis
     }
     public override void DeregisterControls()
     {
+        base.DeregisterControls();
         // REMOVE EVERYTHING THAT WAS SET ABOVE
         controllerButtons[(int)Constants.CONTROLS.BUTTON].action.performed -= ToggleDestroyFlag;
         controllerButtons[(int)Constants.CONTROLS.UP].action.canceled -= StopJUp;
