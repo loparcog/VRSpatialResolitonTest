@@ -4,7 +4,7 @@ using UnityEngine.UI;
 using UnityEngine.XR.Interaction.Toolkit.Inputs.Readers;
 using UnityEngine.XR.Interaction.Toolkit.Inputs.Simulation;
 
-namespace UnityEngine.XR.Interaction.Toolkit.Samples.DeviceSimulator
+namespace UnityEngine.XR.Interaction.Toolkit.Samples.InteractionSimulator
 {
     class XRInteractionSimulatorInputFeedbackUI : MonoBehaviour
     {
@@ -231,10 +231,10 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.DeviceSimulator
         /// </summary>
         protected void Start()
         {
-#if HAS_FIND_FIRST_OBJECT_BY_TYPE
-            var simulator = Object.FindFirstObjectByType<XRInteractionSimulator>();
+#if UNITY_6000_4_OR_NEWER
+            var simulator = FindAnyObjectByType<XRInteractionSimulator>();
 #else
-            var simulator = Object.FindObjectOfType<XRInteractionSimulator>();
+            var simulator = Object.FindFirstObjectByType<XRInteractionSimulator>();
 #endif
             if (simulator != null)
             {
