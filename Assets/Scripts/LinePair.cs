@@ -24,6 +24,7 @@ public class LinePair : MonoBehaviour
             HLP = Standard
             HLP Box = Capped ends
             HLP Infinite = Infinitely long lines
+            HLP E = E shape
         */
         lines = Instantiate(Resources.Load<GameObject>(lineType));
         lines.name = "Line Pairs";
@@ -35,7 +36,9 @@ public class LinePair : MonoBehaviour
 
     public void RotateTo(float angle)
     {
-        lines.transform.Rotate(0, angle, 0);
+        // Make sure lines exist
+        if (lines == null) return;
+        lines.transform.rotation = Quaternion.Euler(0, angle, 0);
     }
 
     public void IncreaseSize(bool fineScale)

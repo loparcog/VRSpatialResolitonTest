@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 public class StartScene : SceneBasis
 {
     public StartScene(InputActionReference[] controls) :
-        base(Resources.Load("Start Screen"), controls) { }
+        base(Resources.Load("Scenes/Start Screen"), controls) { }
     public override void RegisterControls()
     {
         // Set the destruction flag

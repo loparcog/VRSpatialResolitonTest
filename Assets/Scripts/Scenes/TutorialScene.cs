@@ -10,7 +10,7 @@ public class TutorialScene : SceneBasis
 
 
     public TutorialScene(InputActionReference[] controls) :
-        base(Resources.Load("Tutorial Screen"), controls)
+        base(Resources.Load("Scenes/Tutorial Screen"), controls)
     { }
 
     public override void Start()
@@ -19,7 +19,7 @@ public class TutorialScene : SceneBasis
         // Add a line pair to the active scene
         testLinePair = activeScene.AddComponent<LinePair>();
         testLinePair.MakeLines("HLP", 0.5f);
-        testLinePair.lines.transform.position = new Vector3(10, 0, 0);
+        testLinePair.lines.transform.position = new Vector3(10, 0, 4);
     }
     public override void RegisterControls()
     {

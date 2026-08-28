@@ -16,7 +16,7 @@ public class UserDataScene : SceneBasis
     // Logger reference
     LogController log;
     public UserDataScene(InputActionReference[] controls, LogController logger, string userUUID) :
-        base(Resources.Load("User Data Screen"), controls)
+        base(Resources.Load("Scenes/User Data Screen"), controls)
     {
         UUID = userUUID;
         log = logger;

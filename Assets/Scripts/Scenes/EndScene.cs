@@ -5,7 +5,7 @@ public class EndScene : SceneBasis
 {
     private LogController log;
     public EndScene(InputActionReference[] controls, LogController logger) :
-        base(Resources.Load("End Screen"), controls)
+        base(Resources.Load("Scenes/End Screen"), controls)
     {
         log = logger;
     }

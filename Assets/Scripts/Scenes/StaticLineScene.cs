@@ -19,7 +19,7 @@ public class StaticLineScene : SceneBasis
     private LogController log;
 
     public StaticLineScene(InputActionReference[] controls, LogController logger) :
-        base(Resources.Load("Static Screen"), controls)
+        base(Resources.Load("Scenes/Static Screen"), controls)
     {
         // Save the log resource
         log = logger;
@@ -104,7 +104,7 @@ public class StaticLineScene : SceneBasis
                 instructionText.transform.position = new Vector3(-15, 0, 0);
                 break;
             case Constants.LINE_ORIENTATION.DIAGONAL:
-                staticLinePair.RotateTo(45);
+                staticLinePair.RotateTo(135);
                 instructionText.transform.position = new Vector3(-10, 0, 10);
                 break;
             default:

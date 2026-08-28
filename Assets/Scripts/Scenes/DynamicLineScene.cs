@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System;
 
 public class DynamicLineScene : SceneBasis
 {
@@ -15,6 +16,7 @@ public class DynamicLineScene : SceneBasis
     private float[] UpDownTime = { 0, 0 };
     private bool[] UpDownHeld = { false, false };
     private int[] textXYpos = {0,0};
+    private float baseRotation = 0;
     // Base object to add line pair system to
     private GameObject baseObject;
     // Camera references
@@ -27,7 +29,7 @@ public class DynamicLineScene : SceneBasis
 
 
     public DynamicLineScene(InputActionReference[] controls, LogController logger, GameObject staticCam, Transform dynamicCam, GameObject xrO) :
-        base(Resources.Load("Dynamic Screen"), controls)
+        base(Resources.Load("Scenes/Dynamic Screen"), controls)
     {
         // Save camera references for later use
         staticCamera = staticCam;
@@ -61,8 +63,8 @@ public class DynamicLineScene : SceneBasis
         currTest = 0;
         // Remove all created game objects
         dynamicLinePair.Remove();
-        Object.Destroy(baseObject);
-        Object.Destroy(instructionText.gameObject);
+        UnityEngine.Object.Destroy(baseObject);
+        UnityEngine.Object.Destroy(instructionText.gameObject);
     }
 
     private void CreateInstructionText()
@@ -101,7 +103,7 @@ public class DynamicLineScene : SceneBasis
     private void NextTest(InputAction.CallbackContext context)
     {
         // Destroy the existing scene
-        Object.Destroy(activeScene);
+        UnityEngine.Object.Destroy(activeScene);
         // Iterate through each test based on the test ID
         instructionText.text = "Make the lines as small as possible while still being distinguishable";
         if (currTest > 0)
@@ -116,12 +118,12 @@ public class DynamicLineScene : SceneBasis
                 textXYpos[1] = 10;
                 break;
             case Constants.LINE_ORIENTATION.VERTICAL:
-                dynamicLinePair.RotateTo(90);
+                baseRotation = 90;
                 textXYpos[0] = -15;
                 textXYpos[1] = 0;
                 break;
             case Constants.LINE_ORIENTATION.DIAGONAL:
-                dynamicLinePair.RotateTo(45);
+                baseRotation = 135;
                 textXYpos[0] = -10;
                 textXYpos[1] = 10;
                 break;
@@ -130,6 +132,7 @@ public class DynamicLineScene : SceneBasis
                 ToggleDestroyFlag();
                 break;
         }
+        // 
         // Iterate the current test
         currTest++;
     }
@@ -191,5 +194,7 @@ public class DynamicLineScene : SceneBasis
                 dynamicLinePair.DecreaseSize(true);
             }
         }
+        // Perform oscillation based on frame count
+        dynamicLinePair.RotateTo(baseRotation + Mathf.Sin(Time.time) / 4);
     }
 }
