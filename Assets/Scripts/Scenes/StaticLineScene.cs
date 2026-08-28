@@ -7,6 +7,10 @@ public class StaticLineScene : SceneBasis
     // Current test index
     // 0 = Horizontal, 1 = Vertical, 2 = Diagonal
     private Constants.LINE_ORIENTATION currTest = 0;
+    // Line to instantiate
+    // 0 = Infinite, 1 = E
+    private Constants.LINE_TYPE currLine = 0;
+    // Flag for E tests, primarily for logging
     // Line pair object
     private LinePair staticLinePair;
     // Instructions for line scaling
@@ -40,7 +44,9 @@ public class StaticLineScene : SceneBasis
     public override void Destroy()
     {
         base.Destroy();
+        // Reset defaults
         currTest = 0;
+        currLine = 0;
         // Remove all created game objects
         staticLinePair.Remove();
         Object.Destroy(baseObject);
@@ -89,14 +95,27 @@ public class StaticLineScene : SceneBasis
         // If we're past the base case, log the data
         if (currTest > 0)
         {
-            log.LogLineData(staticLinePair.currentScale, currTest - 1);
+            // Up the index by 3 if we're in the E tests
+            log.LogLineData(staticLinePair.currentScale, currLine, currTest - 1);
+        }
+
+        // If we're passed the last orientation, swap to E test
+        // Hardcoded for readability
+        if (currTest > Constants.LINE_ORIENTATION.DIAGONAL & 
+            currLine < Constants.LINE_TYPE.E)
+        {
+            // Iterate the current line test
+            currLine++;
+            // Reset values and remove existing lines
+            currTest = 0;
+            staticLinePair.Remove();
         }
         
         switch (currTest)
         {
             case Constants.LINE_ORIENTATION.HORIZONTAL:
                 // No rotation needed
-                staticLinePair.MakeLines("HLP Infinite", 0.5f);
+                staticLinePair.MakeLines("HLP " + currLine.ToString(), 0.5f);
                 instructionText.transform.position = new Vector3(0, 0, 10);
                 break;
             case Constants.LINE_ORIENTATION.VERTICAL:
@@ -108,7 +127,6 @@ public class StaticLineScene : SceneBasis
                 instructionText.transform.position = new Vector3(-10, 0, 10);
                 break;
             default:
-                // Scene finished, toggle flag
                 ToggleDestroyFlag();
                 break;
         }

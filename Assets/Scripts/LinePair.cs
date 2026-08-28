@@ -8,6 +8,8 @@ public class LinePair : MonoBehaviour
     private Transform xrCamera;
     // Current scale, accessible for writing to logs
     public float currentScale = 0.5f;
+    // Save the line type, as E requires total scaling
+    private string currentLineType;
 
     const float LINE_MAX = 1.0f;
 
@@ -26,7 +28,8 @@ public class LinePair : MonoBehaviour
             HLP Infinite = Infinitely long lines
             HLP E = E shape
         */
-        lines = Instantiate(Resources.Load<GameObject>(lineType));
+        currentLineType = lineType;
+        lines = Instantiate(Resources.Load<GameObject>(currentLineType));
         lines.name = "Line Pairs";
         // Reset the current scale
         currentScale = scale;
@@ -78,9 +81,17 @@ public class LinePair : MonoBehaviour
     }
 
     public void UpdateSize()
-    {
-        lines.transform.localScale = new Vector3(1, 1, currentScale); // FOR WIDTH RESIZING ONLY
-        //lines.transform.localScale = new Vector3(currentScale, 1, currentScale); // FOR WIDTH AND LENGTH RESIZING
+    {   
+        if (currentLineType == "HLP E")
+        {
+            // Scale width and length
+            lines.transform.localScale = new Vector3(currentScale, 1, currentScale);
+        }
+        else
+        {
+            // Scale only width, keep lines infinite
+            lines.transform.localScale = new Vector3(1, 1, currentScale);
+        }
     }
 
     public void keepDistance()

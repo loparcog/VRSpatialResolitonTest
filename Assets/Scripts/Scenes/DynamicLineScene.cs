@@ -1,13 +1,16 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using System;
 
 public class DynamicLineScene : SceneBasis
 {
     // Current test index
     // 0 = Horizontal, 1 = Vertical, 2 = Diagonal
-    private Constants.LINE_ORIENTATION currTest = Constants.LINE_ORIENTATION.HORIZONTAL;
+    // See Constants.cs for definition
+    private Constants.LINE_ORIENTATION currTest = 0;
+    // Line to instantiate
+    // 0 = Infinite, 1 = E
+    private Constants.LINE_TYPE currLine = 0;
     // Line pair object
     private LinePair dynamicLinePair;
     // Instructions for line scaling
@@ -16,6 +19,7 @@ public class DynamicLineScene : SceneBasis
     private float[] UpDownTime = { 0, 0 };
     private bool[] UpDownHeld = { false, false };
     private int[] textXYpos = {0,0};
+    // NOTE: Keeping reference to a base rotation to allow for possible line oscillation in Update()
     private float baseRotation = 0;
     // Base object to add line pair system to
     private GameObject baseObject;
@@ -35,7 +39,7 @@ public class DynamicLineScene : SceneBasis
         staticCamera = staticCam;
         xrCamera = dynamicCam;
         xrOrigin = xrO;
-        // Reference to the logging machine
+        // Keep reference to the logger
         log = logger;
     }
     
@@ -61,14 +65,17 @@ public class DynamicLineScene : SceneBasis
         staticCamera.SetActive(true);
         xrOrigin.SetActive(false);
         currTest = 0;
+        currLine = 0;
+        baseRotation = 0;
         // Remove all created game objects
         dynamicLinePair.Remove();
-        UnityEngine.Object.Destroy(baseObject);
-        UnityEngine.Object.Destroy(instructionText.gameObject);
+        Object.Destroy(baseObject);
+        Object.Destroy(instructionText.gameObject);
     }
 
     private void CreateInstructionText()
     {
+        // Write introductory text for the test
         var textObject = new GameObject();
         textObject.name = "Instruction Text";
         textObject.AddComponent<TextMeshPro>();
@@ -103,18 +110,35 @@ public class DynamicLineScene : SceneBasis
     private void NextTest(InputAction.CallbackContext context)
     {
         // Destroy the existing scene
-        UnityEngine.Object.Destroy(activeScene);
+        Object.Destroy(activeScene);
         // Iterate through each test based on the test ID
         instructionText.text = "Make the lines as small as possible while still being distinguishable";
         if (currTest > 0)
         {
-            log.LogLineData(dynamicLinePair.currentScale, currTest - 1, xrCamera);
+            // Log data if it was a line test
+            log.LogLineData(dynamicLinePair.currentScale, currLine, currTest - 1, true);
         }
+
+        // If we're passed the last orientation, swap to E test
+        // Hardcoded for readability
+        if (currTest > Constants.LINE_ORIENTATION.DIAGONAL & 
+            currLine < Constants.LINE_TYPE.E)
+        {
+            // Iterate the current line type
+            currLine++;
+            // Reset values and remove existing lines
+            currTest = 0;
+            baseRotation = 0;
+            dynamicLinePair.Remove();
+        }
+
+        Debug.Log(currTest);
+
         switch (currTest)
         {
             case Constants.LINE_ORIENTATION.HORIZONTAL:
-                // No rotation needed
-                dynamicLinePair.MakeLines("HLP Infinite", 0.5f);
+                // No rotation needed, defaults as horizontal
+                dynamicLinePair.MakeLines("HLP " + currLine.ToString(), 0.5f);
                 textXYpos[1] = 10;
                 break;
             case Constants.LINE_ORIENTATION.VERTICAL:
@@ -194,7 +218,7 @@ public class DynamicLineScene : SceneBasis
                 dynamicLinePair.DecreaseSize(true);
             }
         }
-        // Perform oscillation based on frame count
+        // Optional line oscillation, very minor to encourage movement
         dynamicLinePair.RotateTo(baseRotation + Mathf.Sin(Time.time) / 4);
     }
 }

@@ -5,12 +5,11 @@ public class LogController
 {
     // Data to be logged:
     private string UUID;
-    private int eyeLeft, eyeRight, IPD, glasses;
-    // S = Static, D = Dynamic
-    // H = Horizontal, V = Vertical, D = Diagonal
-    private float SHLine, SVLine, SDLine, DHLine, DVLine, DDLine;
-    // Head position and rotation for each line
-    private Vector3 HPH, HPV, HPD, HRH, HRV, HRD;
+    private int eyeLeft, eyeRight, glasses;
+    // Store all final line sizes
+    // Horizontal Inf, Vertical Inf, Diagonal Inf, Horizontal E, Vertical E, Diagonal E
+    private float[] staticLines = {-1,-1,-1,-1,-1,-1};
+    private float[] dynamicLines = {-1,-1,-1,-1,-1,-1};
 
     public void Init(string userUUID)
     {
@@ -19,68 +18,37 @@ public class LogController
             // Set up the CSV
             using (StreamWriter sw = new StreamWriter(Application.persistentDataPath + "/" + Constants.LOGFILE))
             {
-                // UUID for the user
-                sw.WriteLine("UUID,Eye Left,Eye Right,IPD,Glasses," +
-                    "Static Horizontal,Static Vertical,Static Diagonal," +
-                    "Dynamic Hoizontal,Head Rotation Horizontal,Head Position Horizontal," +
-                    "Dynamic Vertical,Head Rotation Vertical,Head Position Vertical," +
-                    "Dynamic Diagonal,Head Rotation Diagonal,Head Position Diagonal");
-                // Write the user's UUID
+                // Write the header line
+                sw.WriteLine("UUID,Eye Left,Eye Right,Glasses," +
+                    "Static Line Horizontal,Static Line Vertical,Static Line Diagonal," +
+                    "Static E Horizontal,Static E Vertical,Static E Diagonal," +
+                    "Dynamic Line Hoizontal,Dynamic Line Vertical,Dynamic Line Diagonal" +
+                    "Dynamic E Hoizontal,Dynamic E Vertical,Dynamic E Diagonal");
             }
         }
+        // Save the UUID for later writing
         UUID = userUUID;
         Debug.Log("Data being saved to: " + Application.persistentDataPath + "/" + Constants.LOGFILE);
     }
 
-    public void LogUserData(int leftEye, int rightEye, int IPDist, int hasGlasses)
+    public void LogUserData(int leftEye, int rightEye, int hasGlasses)
     {
         // Store passed data into the logger
         eyeLeft = leftEye;
         eyeRight = rightEye;
-        IPD = IPDist;
         glasses = hasGlasses;
     }
 
-    public void LogLineData(float lineScale, Constants.LINE_ORIENTATION LO, Transform xrCamera = null)
+    public void LogLineData(float lineScale, Constants.LINE_TYPE LT, Constants.LINE_ORIENTATION LO, bool isDynamic = false)
     {
-        if (xrCamera != null)
+        if (isDynamic)
         {
-            // For dynamic settings
-            switch (LO)
-            {
-                case Constants.LINE_ORIENTATION.HORIZONTAL:
-                    DHLine = lineScale;
-                    HPH = xrCamera.localPosition;
-                    HRH = xrCamera.localEulerAngles;
-                    break;
-                case Constants.LINE_ORIENTATION.VERTICAL:
-                    DVLine = lineScale;
-                    HPV = xrCamera.localPosition;
-                    HRV = xrCamera.localEulerAngles;
-                    break;
-                case Constants.LINE_ORIENTATION.DIAGONAL:
-                    DDLine = lineScale;
-                    HPD = xrCamera.localPosition;
-                    HRD = xrCamera.localEulerAngles;
-                    break;
-            }
-            Debug.Log("LOOK: " + HPH + ", " + HPV + ", " + HPD);
+            // 0-2 should be infinite lines, 3-5 should be E
+            dynamicLines[(int)LT * 3 + (int)LO] = lineScale;
         }
         else
         {
-            // For static settings
-            switch (LO)
-            {
-                case Constants.LINE_ORIENTATION.HORIZONTAL:
-                    SHLine = lineScale;
-                    break;
-                case Constants.LINE_ORIENTATION.VERTICAL:
-                    SVLine = lineScale;
-                    break;
-                case Constants.LINE_ORIENTATION.DIAGONAL:
-                    SDLine = lineScale;
-                    break;
-            }
+            staticLines[(int)LT * 3 + (int)LO] = lineScale;
         }
     }
 
@@ -93,22 +61,18 @@ public class LogController
             // EYE DATA
             sw.Write(UUID + ",20/" + eyeLeft +
                 ",20/" + eyeRight +
-                "," + IPD + "mm" +
                 "," + glasses);
             // STATIC TESTING
-            sw.Write("," + SHLine.ToString("F3") + "mm" +
-                "," + SVLine.ToString("F3") + "mm" +
-                "," + SDLine.ToString("F3") + "mm");
+            for (int i = 0; i < staticLines.Length; i++)
+            {
+                sw.Write("," + staticLines[i].ToString("F3") + "mm");
+            }
             // DYNAMIC TESTING
-            sw.Write("," + DHLine.ToString("F3") + "mm" +
-                "," + HRH.y.ToString("F3") + "/" + HRH.x.ToString("F3") +
-                "," + HPH.x.ToString("F3") + "/" + HPH.y.ToString("F3") + "/" + HPH.z.ToString("F3") +
-                "," + DVLine.ToString("F3") + "mm" +
-                "," + HRV.y.ToString("F3") + "/" + HRV.x.ToString("F3") +
-                "," + HPV.x.ToString("F3") + "/" + HPV.y.ToString("F3") + "/" + HPV.z.ToString("F3") +
-                "," + DDLine.ToString("F3") + "mm" +
-                "," + HRD.y.ToString("F3") + "/" + HRD.x.ToString("F3") +
-                "," + HPD.x.ToString("F3") + "/" + HPD.y.ToString("F3") + "/" + HPD.z.ToString("F3") + "\n");
+            for (int i = 0; i < dynamicLines.Length; i++)
+            {
+                sw.Write("," + dynamicLines[i].ToString("F3") + "mm");
+            }
+            sw.Write("\n");
         }    
     }
 }

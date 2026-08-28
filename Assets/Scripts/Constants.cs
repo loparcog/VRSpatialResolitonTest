@@ -18,6 +18,14 @@ public class Constants
         DIAGONAL
     }
 
+    // LINE TYPE ENUM
+    public enum LINE_TYPE
+    {
+        // Use the asset names here for ease of access
+        Infinite,
+        E
+    }
+
     // LOG DATA LOCATION
     public const string LOGFILE = "VRRTData.csv";
     
