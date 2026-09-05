@@ -138,6 +138,7 @@ public class DynamicLineScene : SceneBasis
             case Constants.LINE_ORIENTATION.HORIZONTAL:
                 // No rotation needed, defaults as horizontal
                 dynamicLinePair.MakeLines(currLine.ToString(), 0.5f);
+                textXYpos[0] = 0;
                 textXYpos[1] = 10;
                 break;
             case Constants.LINE_ORIENTATION.VERTICAL:

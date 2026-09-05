@@ -104,7 +104,7 @@ public class LinePair : MonoBehaviour
     public void keepDistance()
     {
         // Maintain distance between camera and lines (0.5cm)
-        if (xrCamera == null) return;
+        if (lines == null) return;
         // Requires SetCamera() to be run beforehand
         lines.transform.position = new Vector3(0, -xrCamera.localPosition.z, 0);
     
