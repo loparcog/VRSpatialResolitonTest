@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Unity.VisualScripting;
 using UnityEngine;
 
 /*
@@ -15,20 +16,26 @@ public class LogController
     private int eyeLeft, eyeRight, glasses;
     // Store all final line sizes
     // Horizontal Inf, Vertical Inf, Diagonal Inf, Horizontal E, Vertical E, Diagonal E
-    private float[] staticLines = {-1,-1,-1,-1,-1,-1};
-    private float[] dynamicLines = {-1,-1,-1,-1,-1,-1};
+    private float[] staticLines;
+    private float[] dynamicLines;
 
     public void Init(string userUUID, bool printDebug)
     {
+        // Save the test numbers for future use
+        string[] ltList = Enum.GetNames(typeof(Constants.LINE_TYPE));
+        string[] loList = Enum.GetNames(typeof(Constants.LINE_ORIENTATION));
+        
+        // Create a new log file if it doesn't already exists
+        // Look in .config/Unity3D/TMU MDSL, will save directly to headset running program
         if (!File.Exists(Application.persistentDataPath + "/" + Constants.LOGFILE))
         {
             // Set up CSV headers using tests chosen in Constants.cs
             string testHeaders = "";
             foreach (string testType in new List<string> {"STATIC", "DYNAMIC"})
             {
-                foreach (string lineType in Enum.GetNames(typeof(Constants.LINE_TYPE)))
+                foreach (string lineType in ltList)
                 {
-                    foreach (string lineOri in Enum.GetNames(typeof(Constants.LINE_ORIENTATION)))
+                    foreach (string lineOri in loList)
                     {
                         testHeaders += "," + string.Join(" ", testType, lineType, lineOri);
                     }
@@ -44,6 +51,10 @@ public class LogController
                 sw.WriteLine("UUID,EYE LEFT,EYE RIGHT,GLASSES" + testHeaders);
             }
         }
+        // Set the size of the static and dynamic line size lists
+        staticLines = new float[ltList.Length * loList.Length];
+        dynamicLines = new float[ltList.Length * loList.Length];
+
         // Save the UUID for later writing
         UUID = userUUID;
         debug = printDebug;
@@ -64,16 +75,17 @@ public class LogController
     public void LogLineData(float lineScale, Constants.LINE_TYPE LT, Constants.LINE_ORIENTATION LO, bool isDynamic = false)
     {
         // Store the tests in the order they were taken
+        // Order is line type > line orientation
         if (isDynamic)
         {
-            dynamicLines[(int)LT * 3 + (int)LO] = lineScale;
+            dynamicLines[(int)LT * Enum.GetNames(typeof(Constants.LINE_ORIENTATION)).Length + (int)LO] = lineScale;
         }
         else
         {
-            staticLines[(int)LT * 3 + (int)LO] = lineScale;
+            staticLines[(int)LT * Enum.GetNames(typeof(Constants.LINE_ORIENTATION)).Length + (int)LO] = lineScale;
         }
 
-        if (debug) { Debug.Log(string.Join(" ", isDynamic ? "Dynamic" : "Static", LT.ToString(), LO.ToString(), ":", lineScale)); }
+        if (debug) { Debug.Log(string.Join(" ", isDynamic ? "DYNAMIC" : "STATIC", LT.ToString(), LO.ToString(), ":", lineScale)); }
     }
 
     public void WriteToFile()

@@ -22,6 +22,18 @@ public class Constants
     }
 
     /*
+        LINE ANCHOR ENUM
+        Defines whether the line is anchored to the headset or to space.
+        This enum is currently only used for logging, but can be expanded
+        to general testing
+    */
+    public enum LINE_ANCHOR
+    {
+        STATIC,
+        DYNAMIC
+    }
+
+    /*
         LINE TYPE ENUM
         Which line shapes shoudl be tested. Each listed line type will
         run all listed LINE ORIENTATION tests before continuing to the
@@ -34,14 +46,14 @@ public class Constants
         /*
             Add and remove any items here to change test
         */
-        Infinite,
+        INFINITE,
         E
     }
 
     /*
         LINE ORIENTATION ENUM
-        Set of tests performed for each selected line type. Add or remove
-        any from this enum to change what tests are performed
+        Set of tests performed for each selected line type. Reorganize
+        to whichever order you would like the test to be done
 
         HORIZONTAL: Lines laid left to right
         VERTICAL: Lines laid top to bottom

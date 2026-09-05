@@ -1,4 +1,3 @@
-using System.IO;
 using UnityEngine;
 
 
@@ -36,6 +35,7 @@ public class LinePair : MonoBehaviour
             Infinite = Five infinitely long 1cm line pairs
             E = A single E shape with 1cm lines
         */
+        currentLineType = lineType;
         lines = Instantiate(Resources.Load<GameObject>("Lines/" + lineType));
         lines.name = "Line Pairs";
         // Reset the current scale
@@ -89,7 +89,7 @@ public class LinePair : MonoBehaviour
 
     public void UpdateSize()
     {   
-        if (currentLineType == "HLP E")
+        if (currentLineType == "E")
         {
             // Scale width and length
             lines.transform.localScale = new Vector3(currentScale, 1, currentScale);
@@ -99,6 +99,8 @@ public class LinePair : MonoBehaviour
             // Scale only width, keep lines infinite
             lines.transform.localScale = new Vector3(1, 1, currentScale);
         }
+
+        Debug.Log(currentScale);
     }
 
     public void keepDistance()

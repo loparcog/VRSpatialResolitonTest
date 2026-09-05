@@ -27,6 +27,7 @@ For any lower level information on the project, please see the `Assets` folder a
 Feel free to use the Issues board on GitHub for any fixes, updates, or questions.
 
 # TODO
+- Fix logging
 - Merge Static and Dynamic line test scripts
 - Update README
 - Proliferate READMEs across folders
