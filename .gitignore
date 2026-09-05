@@ -101,4 +101,4 @@ InitTestScene*.unity*
 
 # Any solution from VSCode
 *.slnx
-
+.DS_Store
