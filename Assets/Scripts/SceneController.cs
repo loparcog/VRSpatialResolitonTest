@@ -1,6 +1,11 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+/*
+    SCENE CONTROLLER
+    Overarching director for all tests and scenes. Can be found in
+    the editor on the Script Manager object
+*/
 public class SceneController : MonoBehaviour
 {
     // Camera objects
@@ -13,6 +18,8 @@ public class SceneController : MonoBehaviour
     [SerializeField] public InputActionReference triggerButton;
     [SerializeField] public InputActionReference joystickUp;
     [SerializeField] public InputActionReference joystickDown;
+    [SerializeField] public bool printDebug;
+    // Log manager
     private LogController log = new LogController();
     private SceneBasis[] sceneList;
     private InputActionReference[] controllerButtons;
@@ -24,7 +31,7 @@ public class SceneController : MonoBehaviour
 
     void Start()
     {
-        // Declare the controls list, abiding by the enum in Constants.cs
+        // Declare the controls list, abiding by the enum order in Constants.cs
         controllerButtons = new InputActionReference[] {
             joystickUp,
             joystickDown,
@@ -41,8 +48,8 @@ public class SceneController : MonoBehaviour
             new DynamicLineScene(controllerButtons, log, staticCamera, xrCamera, xrOrigin),
             new EndScene(controllerButtons, log),
         };
-        // Initialize the log with the user UUID
-        log.Init(UUID);
+        // Initialize the log with the user UUID and debug option
+        log.Init(UUID, printDebug);
         // Build the first scene
         ConstructScene();
 
@@ -54,25 +61,27 @@ public class SceneController : MonoBehaviour
         // Make sure the scene exists
         if (sceneIndex >= sceneList.Length)
         {
-            // For debug use in the Unity editor
-            // UnityEditor.EditorApplication.isPlaying = false;
-            // End the program here if you'd like
+            // End the program
+            #if UNITY_EDITOR
+                UnityEditor.EditorApplication.isPlaying = false;
+            #endif
             Application.Quit();
             return;
         }
+        // Call the custom start script for the selected scene
         sceneList[sceneIndex].Start();
     }
 
     void Update()
     {
-        SceneBasis cS = sceneList[sceneIndex];
+        SceneBasis currentScene = sceneList[sceneIndex];
         // Check the current scene update function
-        cS.Update();
+        currentScene.Update();
         // See if the deletion flag is open
-        if (cS.toDestroy)
+        if (currentScene.toDestroy)
         {
             // See which direction to go for the scene
-            if (cS.goBack)
+            if (currentScene.goBack)
             {
                 sceneIndex--;
             }
@@ -81,7 +90,7 @@ public class SceneController : MonoBehaviour
                 sceneIndex++;
             }
             // Run the destroy function
-            cS.Destroy();
+            currentScene.Destroy();
             // Construct the new scene
             ConstructScene();
         }

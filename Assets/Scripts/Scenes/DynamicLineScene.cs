@@ -1,3 +1,5 @@
+using static System.Enum;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -119,10 +121,9 @@ public class DynamicLineScene : SceneBasis
             log.LogLineData(dynamicLinePair.currentScale, currLine, currTest - 1, true);
         }
 
-        // If we're passed the last orientation, swap to E test
-        // Hardcoded for readability
-        if (currTest > Constants.LINE_ORIENTATION.DIAGONAL & 
-            currLine < Constants.LINE_TYPE.E)
+        // If we're passed the last orientation, swap to next type
+        if (((int)currTest) > GetValues(typeof(Constants.LINE_ORIENTATION)).Cast<int>().Max() & 
+            ((int)currLine) < GetValues(typeof(Constants.LINE_TYPE)).Cast<int>().Max())
         {
             // Iterate the current line type
             currLine++;
@@ -132,13 +133,11 @@ public class DynamicLineScene : SceneBasis
             dynamicLinePair.Remove();
         }
 
-        Debug.Log(currTest);
-
         switch (currTest)
         {
             case Constants.LINE_ORIENTATION.HORIZONTAL:
                 // No rotation needed, defaults as horizontal
-                dynamicLinePair.MakeLines("HLP " + currLine.ToString(), 0.5f);
+                dynamicLinePair.MakeLines(currLine.ToString(), 0.5f);
                 textXYpos[1] = 10;
                 break;
             case Constants.LINE_ORIENTATION.VERTICAL:
@@ -156,7 +155,6 @@ public class DynamicLineScene : SceneBasis
                 ToggleDestroyFlag();
                 break;
         }
-        // 
         // Iterate the current test
         currTest++;
     }

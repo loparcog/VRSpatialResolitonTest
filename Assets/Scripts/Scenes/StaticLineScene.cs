@@ -1,3 +1,5 @@
+using static System.Enum;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -99,12 +101,11 @@ public class StaticLineScene : SceneBasis
             log.LogLineData(staticLinePair.currentScale, currLine, currTest - 1);
         }
 
-        // If we're passed the last orientation, swap to E test
-        // Hardcoded for readability
-        if (currTest > Constants.LINE_ORIENTATION.DIAGONAL & 
-            currLine < Constants.LINE_TYPE.E)
+        // If we're passed the last orientation, swap to next type
+        if (((int)currTest) > GetValues(typeof(Constants.LINE_ORIENTATION)).Cast<int>().Max() & 
+            ((int)currLine) < GetValues(typeof(Constants.LINE_TYPE)).Cast<int>().Max())
         {
-            // Iterate the current line test
+            // Iterate the current line type
             currLine++;
             // Reset values and remove existing lines
             currTest = 0;
@@ -115,7 +116,7 @@ public class StaticLineScene : SceneBasis
         {
             case Constants.LINE_ORIENTATION.HORIZONTAL:
                 // No rotation needed
-                staticLinePair.MakeLines("HLP " + currLine.ToString(), 0.5f);
+                staticLinePair.MakeLines(currLine.ToString(), 0.5f);
                 instructionText.transform.position = new Vector3(0, 0, 10);
                 break;
             case Constants.LINE_ORIENTATION.VERTICAL:

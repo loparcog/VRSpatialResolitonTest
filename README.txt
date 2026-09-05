@@ -25,3 +25,9 @@ For any lower level information on the project, please see the `Assets` folder a
 # Issues
 
 Feel free to use the Issues board on GitHub for any fixes, updates, or questions.
+
+# TODO
+- Merge Static and Dynamic line test scripts
+- Update README
+- Proliferate READMEs across folders
+- Fully test with different line selections

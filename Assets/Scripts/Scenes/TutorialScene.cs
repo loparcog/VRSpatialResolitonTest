@@ -18,7 +18,8 @@ public class TutorialScene : SceneBasis
         base.Start();
         // Add a line pair to the active scene
         testLinePair = activeScene.AddComponent<LinePair>();
-        testLinePair.MakeLines("HLP", 0.5f);
+        // Use the default line size
+        testLinePair.MakeLines("Default", 0.5f);
         testLinePair.lines.transform.position = new Vector3(10, 0, 4);
     }
     public override void RegisterControls()

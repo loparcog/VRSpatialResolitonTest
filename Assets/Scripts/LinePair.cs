@@ -1,16 +1,24 @@
 using System.IO;
 using UnityEngine;
 
+
+/*
+    Line Pair Utility Class
+    Used for all instantiation and modification of a given line
+    pair object. All line types can be found in Assets/Resources/Lines,
+    and tested lines can be modified in Constants.cs
+*/
 public class LinePair : MonoBehaviour
 {
-    // Horizontal line pair (1mm lines)
+    // Lines to instantiate
     public GameObject lines;
+    // Camera reference for dynamic testing, maintain line distance
     private Transform xrCamera;
     // Current scale, accessible for writing to logs
     public float currentScale = 0.5f;
-    // Save the line type, as E requires total scaling
+    // Save the line type, as E requires x/y scaling, while others only require y
     private string currentLineType;
-
+    // Max line size
     const float LINE_MAX = 1.0f;
 
     public void SetCamera(Transform camera)
@@ -21,15 +29,14 @@ public class LinePair : MonoBehaviour
 
     public void MakeLines(string lineType, float scale = LINE_MAX)
     {
-        // Instantiate the line pair
         /*
-            HLP = Standard
-            HLP Box = Capped ends
-            HLP Infinite = Infinitely long lines
-            HLP E = E shape
+            Instantiate the selected lineType
+            Default = Five 1cm line pairs
+            Box = Five capped 1cm line pairs
+            Infinite = Five infinitely long 1cm line pairs
+            E = A single E shape with 1cm lines
         */
-        currentLineType = lineType;
-        lines = Instantiate(Resources.Load<GameObject>(currentLineType));
+        lines = Instantiate(Resources.Load<GameObject>("Lines/" + lineType));
         lines.name = "Line Pairs";
         // Reset the current scale
         currentScale = scale;
@@ -96,11 +103,11 @@ public class LinePair : MonoBehaviour
 
     public void keepDistance()
     {
-        if (lines)
-        {
-            // Requires SetCamera() to be run beforehand
-            lines.transform.position = new Vector3(0, -xrCamera.localPosition.z, 0);
-        }
+        // Maintain distance between camera and lines (0.5cm)
+        if (xrCamera == null) return;
+        // Requires SetCamera() to be run beforehand
+        lines.transform.position = new Vector3(0, -xrCamera.localPosition.z, 0);
+    
     }
 
     public void Remove()
