@@ -43,8 +43,6 @@ public class LogController
                 }
             }
 
-            Debug.Log(testHeaders);
-
             using (StreamWriter sw = new StreamWriter(Application.persistentDataPath + "/" + Constants.LOGFILE))
             {
                 // User data prefix

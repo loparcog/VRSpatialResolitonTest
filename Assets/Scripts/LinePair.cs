@@ -99,8 +99,6 @@ public class LinePair : MonoBehaviour
             // Scale only width, keep lines infinite
             lines.transform.localScale = new Vector3(1, 1, currentScale);
         }
-
-        Debug.Log(currentScale);
     }
 
     public void keepDistance()
