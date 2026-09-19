@@ -218,6 +218,6 @@ public class DynamicLineScene : SceneBasis
             }
         }
         // Optional line oscillation, very minor to encourage movement
-        dynamicLinePair.RotateTo(baseRotation + Mathf.Sin(Time.time) / 4);
+        dynamicLinePair.RotateTo(baseRotation);// + Mathf.Sin(Time.time) / 4);
     }
 }
